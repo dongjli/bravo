@@ -1,0 +1,5 @@
+useDynLib(bsvs, .registration=TRUE)
+exportPattern("^[[:alpha:]]+")
+importFrom(Rcpp, evalCpp)
+import(compiler)
+import(Matrix)
