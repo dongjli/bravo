@@ -1,18 +1,18 @@
 Package: bsvs
-Title: What the Package Does (One Line, Title Case)
-Version: 0.0.0.9000
-Authors@R: 
-    person(given = "First",
-           family = "Last",
-           role = c("aut", "cre"),
-           email = "first.last@example.com",
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
-License: What license it uses
+Type: Package
+Title: Bayesian Screening and Variable Selection
+Version: 2.0.0
+Author: Somak Dutta [aut, cre],
+  Dongjin Li [aut]
+  Vivekananda Roy [ctb]
+Maintainer: Dongjin Li <dongjl@iastate.edu>
+Description: Performs Bayesian iterated screening and/or variable selection for ultra-high dimensional Gaussian linear regression models.
+License: GPL-3
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 6.1.1
-Imports: Rcpp (>= 1.0.2)
+Depends: R (>= 3.0.2), methods
+Imports: Rcpp (>= 1.0.2), Matrix (>= 1.2-17), compiler
 LinkingTo: Rcpp
-Imports: Matrix, compiler
+NeedsCompilation: yes
+RoxygenNote: 6.1.1
 

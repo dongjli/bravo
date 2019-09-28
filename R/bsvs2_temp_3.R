@@ -1,3 +1,7 @@
+#' Bayesian Iterated Screening (ultra-high, high or low dimensional).
+#' @rdname bsvs2_temp
+#' @description Perform Bayesian iterated screening in Gaussian regression models
+
 bsvs2_temp <- function(xmat, ys, xty, lam, w, k, D, xbar, temp, temp.multip, logp.best, r.idx.best, n, ncovar) {
   Miter = 200
   currlogp <- numeric(Miter)
@@ -25,6 +29,7 @@ bsvs2_temp <- function(xmat, ys, xty, lam, w, k, D, xbar, temp, temp.multip, log
   currlogp[1]<-logp.curr
   model.sizes[1] <- 1
   curridx[1] <- rc.idx
+  count <- 0
 
   for (m in 1:(Miter-1)) {
     #logp.curr.old <- logp.curr
@@ -115,10 +120,9 @@ bsvs2_temp <- function(xmat, ys, xty, lam, w, k, D, xbar, temp, temp.multip, log
       r.idx.best <- rc.idx
     }
 
-    print(m)
     print(sort(rc.idx))
-    #print(sort(r.idx.best))
-    #print(c(logp.best, logp.curr))
+    print(sort(r.idx.best))
+    print(c(logp.best, logp.curr))
 
     currlogp[m+1] <- logp.curr
     currlength <- length(rc.idx)

@@ -8,13 +8,14 @@ swapvar <- function(model, x, ys, xty, lam, w, D, xbar, swapOnly=F) {
   if (swapOnly == T) {
     logp <- matrix(0, nrow=p, ncol=p0)
     if (p0 == 1) {
-      logp[, 1] <- addvar(model=NULL, x=x, ys=ys, xty=xty, lam=lam, w=w, D=D, xbar=xbar)
+      r1 <- addvar(model=NULL, x=x, ys=ys, xty=xty, lam=lam, w=w, D=D, xbar=xbar)
+      logp[, 1] <- r1$logp
       logp[model, 1] <- -Inf
     } else {
       x0 <- scale(x[, model, drop=F])
       xgx <- crossprod(x0) + lam*diag(p0)
-      #x0x1 <- crossprod(x0, x) - crossprod(x0, matrix(rep(1, n), nrow = n) %*% xbar)
-      x0x1 <- crossprod(x0, x)
+      #x0x1 <- crossprod(x0, x) - matrix(colSums(x0), nrow = p0) %*% xbar
+      x0x1 <- crossprod(x0, x) - crossprod(x0, matrix(rep(1, n), nrow = n) %*% xbar)
       x0x <- x0x1 %*% Diagonal(p,x=D)
       for (j in 1:p0) {
         # delete one variable in the current model
@@ -49,14 +50,14 @@ swapvar <- function(model, x, ys, xty, lam, w, D, xbar, swapOnly=F) {
     logp <- matrix(0, nrow=p, ncol=p0+1)
     if (p0 == 1) {
       logp.del <- -(n-1)/2*log(yty)
-      logp[, 2] <- addvar(model=NULL, x=x, ys=ys, xty=xty, lam=lam, w=w, D=D, xbar=xbar)
+      r1 <- addvar(model=NULL, x=x, ys=ys, xty=xty, lam=lam, w=w, D=D, xbar=xbar)
+      logp[, 2] <- r1$logp
       logp[model, 2] <- -Inf
     } else {
       logp.del <- numeric(p0)
       x0 <- scale(x[, model, drop=F])
       xgx <- crossprod(x0) + lam*diag(p0)
-      #x0x1 <- crossprod(x0, x) - matrix(colSums(x0), nrow = p0) %*% xbar)
-      x0x1 <- crossprod(x0, x)
+      x0x1 <- crossprod(x0, x) - matrix(colSums(x0), nrow = p0) %*% xbar
       x0x <- x0x1 %*% Diagonal(p,x=D)
       for (j in 1:p0) {
         # delete one variable in the current model

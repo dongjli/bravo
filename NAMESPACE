@@ -1,5 +1,18 @@
 useDynLib(bsvs, .registration=TRUE)
-exportPattern("^[[:alpha:]]+")
+
+useDynLib(bsvs, .registration=TRUE)
+
 importFrom(Rcpp, evalCpp)
+useDynLib(bsvs, .registration = TRUE)
+
 import(compiler)
-import(Matrix)
+importFrom("stats", "sd")
+
+importFrom("Matrix","Diagonal","sparseMatrix","tcrossprod","crossprod","diag","colMeans","colSums",
+           "t","rowMeans")
+importClassesFrom(Matrix, dgeMatrix, dgCMatrix, dsCMatrix,dtCMatrix)
+importFrom("methods", "as")
+
+export(bis)
+export(mybsvs)
+export(bsvs2_temp)

@@ -2,14 +2,14 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 colSumSq_dge <- function(x, dim) {
-    .Call('_bsvs_colSumSq_dge', PACKAGE = 'bsvs', x, dim)
+    .Call(`_bsvs_colSumSq_dge`, x, dim)
 }
 
 colSumSq_matrix <- function(x) {
-    .Call('_bsvs_colSumSq_matrix', PACKAGE = 'bsvs', x)
+    .Call(`_bsvs_colSumSq_matrix`, x)
 }
 
 colMSD_dgc <- function(mat, m) {
-    .Call('_bsvs_colMSD_dgc', PACKAGE = 'bsvs', mat, m)
+    .Call(`_bsvs_colMSD_dgc`, mat, m)
 }
 
