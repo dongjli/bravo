@@ -14,8 +14,7 @@ swapvar <- function(model, x, ys, xty, lam, w, D, xbar, swapOnly=F) {
     } else {
       x0 <- scale(x[, model, drop=F])
       xgx <- crossprod(x0) + lam*diag(p0)
-      #x0x1 <- crossprod(x0, x) - matrix(colSums(x0), nrow = p0) %*% xbar
-      x0x1 <- crossprod(x0, x) - crossprod(x0, matrix(rep(1, n), nrow = n) %*% xbar)
+      x0x1 <- crossprod(x0, x)
       x0x <- x0x1 %*% Diagonal(p,x=D)
       for (j in 1:p0) {
         # delete one variable in the current model
@@ -57,7 +56,8 @@ swapvar <- function(model, x, ys, xty, lam, w, D, xbar, swapOnly=F) {
       logp.del <- numeric(p0)
       x0 <- scale(x[, model, drop=F])
       xgx <- crossprod(x0) + lam*diag(p0)
-      x0x1 <- crossprod(x0, x) - matrix(colSums(x0), nrow = p0) %*% xbar
+      #x0x1 <- crossprod(x0, x) - matrix(colSums(x0), nrow = p0) %*% xbar
+      x0x1 <- crossprod(x0, x)
       x0x <- x0x1 %*% Diagonal(p,x=D)
       for (j in 1:p0) {
         # delete one variable in the current model

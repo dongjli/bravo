@@ -120,9 +120,9 @@ bsvs2_temp <- function(xmat, ys, xty, lam, w, k, D, xbar, temp, temp.multip, log
       r.idx.best <- rc.idx
     }
 
-    print(sort(rc.idx))
-    print(sort(r.idx.best))
-    print(c(logp.best, logp.curr))
+    #print(sort(rc.idx))
+    #print(sort(r.idx.best))
+    #print(c(logp.best, logp.curr))
 
     currlogp[m+1] <- logp.curr
     currlength <- length(rc.idx)

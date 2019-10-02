@@ -33,20 +33,22 @@ mybsvs <- function(X, y, w, lam, temp.multip=3, M=200, trueidx) {
   #size <- integer(M*10)
   indices <- integer(M*100)
 
+  cat("Start Running:", "\n")
   o <- bsvs1(X, ys, Xty, lam, w, k, D, xbar, n, ncovar)
+  #saveRDS(o, file = "./results2/o0.rds")
   logp.best <- o$bestlogp
   r.idx.best <- o$bestidx
   logp <- o$currlogp
   size <- o$modelsizes
   ed <- sum(size)
   indices[1:ed] <- o$curridx
-  #saveRDS(o, file = "./result/res0.rds")
 
 
   t0 = 1
   for (t in t0:9) {
-    #cat(t, "\n")
+    cat("t =", t, "\n")
     o <- bsvs2_temp(X, ys, Xty, lam, w, k, D, xbar, t, temp.multip, logp.best, r.idx.best, n, ncovar)
+    #saveRDS(o, paste0("./results2/o", t, ".rds"))
     logp.best <- o$bestlogp
     r.idx.best <- o$bestidx
     logp <- append(logp, o$currlogp)
@@ -55,9 +57,7 @@ mybsvs <- function(X, y, w, lam, temp.multip=3, M=200, trueidx) {
     #size[(M*t+1):(M*(t+1))] <- o$modelsizes
     indices[(ed+1):(ed+sum(o$modelsizes))] <- o$curridx
     ed <- ed + sum(o$modelsizes)
-    #saveRDS(o, file = paste0("./result/res", t,".rds"))
   }
-
   indices <- indices[indices>0]
   cumsize <- cumsum(size)
   modelSparse <- sparseMatrix(i=indices,p = c(0,cumsize),index1 = T,dims = c(ncovar,M*10), x = T)
