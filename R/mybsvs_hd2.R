@@ -29,17 +29,17 @@ mybsvs <- function(X, y, w, lam, temp.multip=3, M=200, trueidx) {
   }
   Xty = D*as.numeric(crossprod(X,ys))
 
-  #logp <- numeric(M*10)
-  #size <- integer(M*10)
+  logp <- numeric()
+  size <- integer()
   indices <- integer(M*100)
 
-  cat("Start Running:", "\n")
   o <- bsvs1(X, ys, Xty, lam, w, k, D, xbar, n, ncovar)
-  #saveRDS(o, file = "./results2/o0.rds")
+  saveRDS(o, file = "./results2/o0.rds")
   logp.best <- o$bestlogp
   r.idx.best <- o$bestidx
-  logp <- o$currlogp
-  size <- o$modelsizes
+  nmodel <- o$nmodel
+  logp[1:nmodel] <- o$currlogp
+  size[1:nmodel] <- o$modelsizes
   ed <- sum(size)
   indices[1:ed] <- o$curridx
 
@@ -48,19 +48,21 @@ mybsvs <- function(X, y, w, lam, temp.multip=3, M=200, trueidx) {
   for (t in t0:9) {
     cat("t =", t, "\n")
     o <- bsvs2_temp(X, ys, Xty, lam, w, k, D, xbar, t, temp.multip, logp.best, r.idx.best, n, ncovar)
-    #saveRDS(o, paste0("./results2/o", t, ".rds"))
+    saveRDS(o, paste0("./results2/o", t, ".rds"))
     logp.best <- o$bestlogp
     r.idx.best <- o$bestidx
-    logp <- append(logp, o$currlogp)
-    size <- append(size, o$modelsizes)
-    #logp[(M*t+1):(M*(t+1))] <- o$currlogp
-    #size[(M*t+1):(M*(t+1))] <- o$modelsizes
+    nmodel_curr <- o$nmodel
+    logp[(nmodel+1):(nmodel+nmodel_curr)] <- o$currlogp
+    size[(nmodel+1):(nmodel+nmodel_curr)] <- o$modelsizes
     indices[(ed+1):(ed+sum(o$modelsizes))] <- o$curridx
     ed <- ed + sum(o$modelsizes)
+    nmodel <- nmodel + nmodel_curr
   }
   indices <- indices[indices>0]
   cumsize <- cumsum(size)
-  modelSparse <- sparseMatrix(i=indices,p = c(0,cumsize),index1 = T,dims = c(ncovar,M*10), x = T)
+  print(length(size))
+  print(length(logp))
+  modelSparse <- sparseMatrix(i=indices,p = c(0,cumsize),index1 = T,dims = c(ncovar,length(logp)), x = T)
 
   logp.uniq1 <- unique(logp)
   for (i in 1:(length(logp.uniq1)-1)) {

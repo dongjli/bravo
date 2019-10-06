@@ -9,7 +9,7 @@ import(compiler)
 importFrom("stats", "sd")
 
 importFrom("Matrix","Diagonal","sparseMatrix","tcrossprod","crossprod","diag","colMeans","colSums",
-           "t","rowMeans")
+           "t","rowMeans", "rowSums", "solve")
 importClassesFrom(Matrix, dgeMatrix, dgCMatrix, dsCMatrix,dtCMatrix)
 importFrom("methods", "as")
 

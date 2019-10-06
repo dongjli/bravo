@@ -30,9 +30,9 @@ bsvs2_temp <- function(xmat, ys, xty, lam, w, k, D, xbar, temp, temp.multip, log
   model.sizes[1] <- 1
   curridx[1] <- rc.idx
   count <- 0
+  track <- 1
 
   for (m in 1:(Miter-1)) {
-    #logp.curr.old <- logp.curr
     r.idx.old <- rc.idx
     if (length(rc.idx) == 0) {
       r <- addvar(model=NULL, x=xmat, ys=ys, xty=xty, lam=lam, w=w, D=D, xbar=xbar)
@@ -47,7 +47,8 @@ bsvs2_temp <- function(xmat, ys, xty, lam, w, k, D, xbar, temp, temp.multip, log
       }
       rc.idx <- rc.k.idx[mh.step$idx]
       para.add <- addpara(x=xmat, xty=xty, model=rc.idx, lam=lam, D=D, xbar=xbar)
-
+      track <- track + 1
+      
     } else {
       die <- sample.int(3, 1)
       if (count == 1000 && die == die.prev) next
@@ -69,7 +70,7 @@ bsvs2_temp <- function(xmat, ys, xty, lam, w, k, D, xbar, temp, temp.multip, log
         idx.add = rc.k.idx[mh.step$idx]
         rc.idx <- c(r.idx.old, idx.add)
         para.add <- addpara(x=xmat, xty=xty, model=rc.idx, lam=lam, D=D, xbar=xbar)
-
+        track <- track + 1
       } else if (die == 2) {
         res <- delvar(model=rc.idx, x=xmat, xty=xty, lam=lam, w=w, D=D, xbar=xbar)
         l <- length(rc.idx)
@@ -89,7 +90,8 @@ bsvs2_temp <- function(xmat, ys, xty, lam, w, k, D, xbar, temp, temp.multip, log
         if (length(rc.idx)>0) {
           para.add <- addpara(x=xmat, xty=xty, model=rc.idx, lam=lam, D=D, xbar=xbar)
         }
-
+        track <- track + 1
+        
       } else {
         res <- swapvar(model=rc.idx, x=xmat, ys=ys, xty=xty, lam=lam, w=w, D=D, xbar=xbar, swapOnly = T)
         rc.k.idx <- order(res, decreasing = T)[1:k]
@@ -112,6 +114,7 @@ bsvs2_temp <- function(xmat, ys, xty, lam, w, k, D, xbar, temp, temp.multip, log
           rc.idx <- c(r.idx.old[-idx.del], ncovar)
         }
         para.add <- addpara(x=xmat, xty=xty, model=rc.idx, lam=lam, D=D, xbar=xbar)
+        track <- track + 1
       }
     }
 
@@ -124,19 +127,19 @@ bsvs2_temp <- function(xmat, ys, xty, lam, w, k, D, xbar, temp, temp.multip, log
     #print(sort(r.idx.best))
     #print(c(logp.best, logp.curr))
 
-    currlogp[m+1] <- logp.curr
+    currlogp[track] <- logp.curr
     currlength <- length(rc.idx)
-    model.sizes[m+1] <- currlength
+    model.sizes[track] <- currlength
     end <- end + currlength
     if (currlength != 0){
       curridx[start:end] <- rc.idx
       start <- start + currlength
     }
+    currlogp <- currlogp[1:track]
+    model.sizes <- model.sizes[1:track]
   }
-  currlogp <- currlogp[currlogp!=0]
-  model.sizes <- model.sizes[model.sizes!=0]
   return(list(bestlogp=logp.best, bestidx=r.idx.best, currlogp=currlogp,
-              modelsizes=model.sizes, curridx=curridx, temp=temp))
+              modelsizes=model.sizes, curridx=curridx, nmodel=track))
 }
 
 bsvs2_temp <- cmpfun(bsvs2_temp)

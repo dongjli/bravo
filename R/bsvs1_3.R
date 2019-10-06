@@ -29,7 +29,7 @@ bsvs1 <- function(xmat, ys, xty, lam, w, k, D, xbar, n, ncovar) {
 
 
   for (m in 1:(Miter-1)) {
-    #logp.curr.old <- logp.curr
+    
     r.idx.old <- rc.idx
     if (length(rc.idx) > 0) {
       para.add <- addpara(x=xmat, xty=xty, model=rc.idx, lam=lam, D=D, xbar=xbar)
@@ -80,9 +80,9 @@ bsvs1 <- function(xmat, ys, xty, lam, w, k, D, xbar, n, ncovar) {
       r.idx.best <- rc.idx
     }
 
-    print(sort(rc.idx))
-    print(sort(r.idx.best))
-    print(c(logp.best, logp.curr))
+    #print(sort(rc.idx))
+    #print(sort(r.idx.best))
+    #print(c(logp.best, logp.curr))
 
     currlogp[m+1] <- logp.curr
     currlength <- length(rc.idx)
@@ -92,11 +92,18 @@ bsvs1 <- function(xmat, ys, xty, lam, w, k, D, xbar, n, ncovar) {
       curridx[start:end] <- rc.idx
       start <- start + currlength
     }
+    
   }
-  currlogp <- currlogp[1:m]
-  model.sizes <- model.sizes[1:m]
+  if (m < Miter-1) {
+    currlogp <- currlogp[1:m]
+    model.sizes <- model.sizes[1:m]
+    nmodel <- m
+  } else {
+    nmodel <- ifelse(count == 500, m, Miter)
+  }
+
   return(list(bestlogp=logp.best, bestidx=r.idx.best, currlogp=currlogp,
-              modelsizes=model.sizes, curridx=curridx))
+              modelsizes=model.sizes, curridx=curridx, nmodel=nmodel))
 }
 
 bsvs1 <- cmpfun(bsvs1)
