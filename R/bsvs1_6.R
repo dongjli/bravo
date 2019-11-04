@@ -1,5 +1,4 @@
-bsvs1 <- function(xmat, ys, xty, lam, w, k, D, xbar, n, ncovar) {
-  Miter = 200
+bsvs1 <- function(xmat, ys, xty, lam, w, topKeep, D, xbar, n, ncovar, Miter) {
   currlogp <- numeric(Miter)
   curridx <- integer()
   model.sizes <- integer(Miter)
@@ -10,15 +9,13 @@ bsvs1 <- function(xmat, ys, xty, lam, w, k, D, xbar, n, ncovar) {
 
   r <- addvar(model=NULL, x=xmat, ys=ys, xty=xty, lam=lam, w=w, D=D, xbar=xbar)
   res1 <- r$logp
+  res1.top <- res1[max(res1)-res1 < 6]
+  k <- max(topKeep, length(res1.top))
   rc.k.idx <- order(res1, decreasing = T)[1:k]
   rc.k <- res1[rc.k.idx]
-  mh.step <- mh(logp.curr, rc.k, k, temperature = F)
-  logp.curr <- mh.step$logp
-  while(!mh.step$success) {
-    mh.step <- mh(logp.curr, rc.k, k, temperature = F)
-    logp.curr <- mh.step$logp
-  }
-  rc.idx <- rc.k.idx[mh.step$idx]
+  s <- sample.int(k, 1, prob = exp(rc.k-max(rc.k, na.rm = T)))
+  logp.curr <- rc.k[s]
+  rc.idx <- rc.k.idx[s]
 
   logp.best <- logp.curr
   r.idx.best <- rc.idx
@@ -29,7 +26,7 @@ bsvs1 <- function(xmat, ys, xty, lam, w, k, D, xbar, n, ncovar) {
 
 
   for (m in 1:(Miter-1)) {
-    
+
     r.idx.old <- rc.idx
     if (length(rc.idx) > 0) {
       para.add <- addpara(x=xmat, xty=xty, model=rc.idx, lam=lam, D=D, xbar=xbar)
@@ -42,18 +39,13 @@ bsvs1 <- function(xmat, ys, xty, lam, w, k, D, xbar, n, ncovar) {
       res.swap <- c()
     }
     rc <- cbind(res.add, res.swap)
+    rc.top <- rc[max(rc)-rc < 6]
+    k <- max(topKeep, length(rc.top))
     rc.k.idx <- order(rc, decreasing = T)[1:k]
     rc.k <- rc[rc.k.idx]
-    mh.step <- mh(logp.curr, rc.k, k, temperature = F)
-    logp.curr <- mh.step$logp
-    count <- 0
-    while(!mh.step$success && count < 500) {
-      mh.step <- mh(logp.curr, rc.k, k, temperature = F)
-      logp.curr <- mh.step$logp
-      count <- count + 1
-    }
-    if(count == 500) break
-    idx.pick = rc.k.idx[mh.step$idx]
+    s <- sample.int(k, 1, prob = exp(rc.k-max(rc.k, na.rm = T)))
+    logp.curr <- rc.k[s]
+    idx.pick = rc.k.idx[s]
     if(idx.pick <= ncovar) {
       rc.idx <- c(r.idx.old, idx.pick)
     } else {
@@ -80,9 +72,9 @@ bsvs1 <- function(xmat, ys, xty, lam, w, k, D, xbar, n, ncovar) {
       r.idx.best <- rc.idx
     }
 
-    #print(sort(rc.idx))
-    #print(sort(r.idx.best))
-    #print(c(logp.best, logp.curr))
+    # print(sort(rc.idx))
+    # print(sort(r.idx.best))
+    # print(c(logp.best, logp.curr))
 
     currlogp[m+1] <- logp.curr
     currlength <- length(rc.idx)
@@ -92,18 +84,10 @@ bsvs1 <- function(xmat, ys, xty, lam, w, k, D, xbar, n, ncovar) {
       curridx[start:end] <- rc.idx
       start <- start + currlength
     }
-    
-  }
-  if (m < Miter-1) {
-    currlogp <- currlogp[1:m]
-    model.sizes <- model.sizes[1:m]
-    nmodel <- m
-  } else {
-    nmodel <- ifelse(count == 500, m, Miter)
   }
 
   return(list(bestlogp=logp.best, bestidx=r.idx.best, currlogp=currlogp,
-              modelsizes=model.sizes, curridx=curridx, nmodel=nmodel))
+              modelsizes=model.sizes, curridx=curridx))
 }
 
 bsvs1 <- cmpfun(bsvs1)

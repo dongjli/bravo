@@ -11,7 +11,7 @@
 #' @param temp.multip The temperature multiple. Default: 3.
 #' @param M The number of iteration. Default: 200.
 
-mybsvs <- function(X, y, w, lam, temp.multip=3, M=200, trueidx) {
+mybsvs <- function(X, y, w, lam, tmax=2, temp.multip=3, Miter=50, threhold=0.5) {
   result <- list()
   k=20
 
@@ -29,39 +29,34 @@ mybsvs <- function(X, y, w, lam, temp.multip=3, M=200, trueidx) {
   }
   Xty = D*as.numeric(crossprod(X,ys))
 
-  logp <- numeric()
-  size <- integer()
-  indices <- integer(M*100)
+  logp <- numeric(Miter * (tmax+1))
+  size <- integer(Miter * (tmax+1))
+  indices <- integer(Miter*100)
 
-  o <- bsvs1(X, ys, Xty, lam, w, k, D, xbar, n, ncovar)
-  saveRDS(o, file = "./results2/o0.rds")
+  o <- bsvs1(X, ys, Xty, lam, w, k, D, xbar, n, ncovar, Miter)
+  #saveRDS(o, file = "./results6/o0.rds")
   logp.best <- o$bestlogp
   r.idx.best <- o$bestidx
-  nmodel <- o$nmodel
-  logp[1:nmodel] <- o$currlogp
-  size[1:nmodel] <- o$modelsizes
+  logp[1:Miter] <- o$currlogp
+  size[1:Miter] <- o$modelsizes
   ed <- sum(size)
   indices[1:ed] <- o$curridx
 
 
   t0 = 1
-  for (t in t0:9) {
+  for (t in t0:tmax) {
     cat("t =", t, "\n")
-    o <- bsvs2_temp(X, ys, Xty, lam, w, k, D, xbar, t, temp.multip, logp.best, r.idx.best, n, ncovar)
-    saveRDS(o, paste0("./results2/o", t, ".rds"))
+    o <- bsvs1_temp(X, ys, Xty, lam, w, k, D, xbar, t, temp.multip, logp.best, r.idx.best, n, ncovar, Miter)
+    #saveRDS(o, file = paste0("./results6/o", t, ".rds"))
     logp.best <- o$bestlogp
     r.idx.best <- o$bestidx
-    nmodel_curr <- o$nmodel
-    logp[(nmodel+1):(nmodel+nmodel_curr)] <- o$currlogp
-    size[(nmodel+1):(nmodel+nmodel_curr)] <- o$modelsizes
+    logp[(Miter*t+1):(Miter*(t+1))] <- o$currlogp
+    size[(Miter*t+1):(Miter*(t+1))] <- o$modelsizes
     indices[(ed+1):(ed+sum(o$modelsizes))] <- o$curridx
     ed <- ed + sum(o$modelsizes)
-    nmodel <- nmodel + nmodel_curr
   }
   indices <- indices[indices>0]
   cumsize <- cumsum(size)
-  print(length(size))
-  print(length(logp))
   modelSparse <- sparseMatrix(i=indices,p = c(0,cumsize),index1 = T,dims = c(ncovar,length(logp)), x = T)
 
   logp.uniq1 <- unique(logp)
@@ -76,7 +71,7 @@ mybsvs <- function(X, y, w, lam, temp.multip=3, M=200, trueidx) {
   logp.top <- sort(logp.uniq[(logp.best-logp.uniq)<16], decreasing = T)
   cols.top <- unlist(lapply(logp.top, FUN=function(x){which(x==logp)[1]}))
   size.top <- size[cols.top]
-  model.top <- modelSparse[, cols.top]
+  model.top <- modelSparse[, cols.top, drop=F]
 
   logp.top <- logp.top-logp.best
   weight <- exp(logp.top)/sum(exp(logp.top))
@@ -94,42 +89,26 @@ mybsvs <- function(X, y, w, lam, temp.multip=3, M=200, trueidx) {
    }
   }
 
-  beta.mode <- beta.est[, 1]
-  beta.weighted <- rowSums(beta.est%*%diag(weight, nrow=length(size.top)))
+  beta.MAP <- beta.est[, 1]
+  beta.WAM <- rowSums(beta.est%*%diag(weight, nrow=length(size.top)))
 
-  model.BMA <- sort(which(rowSums(model.top%*%Diagonal(length(weight), weight)) >= 0.5))
+  MIP = rowSums(model.top%*%Diagonal(length(weight), weight))
+  model.WAM <- sort(which(MIP >= threhold))
   model.MAP <- sort(r.idx.best)
-  models <- list(model.BMA=model.BMA, model.MAP=model.MAP)
-
-  nvarsBMA <- length(model.BMA)
-  includeBMA <- ifelse (all(trueidx %in% model.BMA), 1, 0)
-  if (length(model.BMA) != 0){
-    fdrBMA <- sum(!(model.BMA %in% trueidx), na.rm = T)/length(model.BMA)
-  } else {
-    fdrBMA <- 0
-  }
-  fnrBMA <- (length(trueidx) - length(intersect(model.BMA, trueidx)))/(length(trueidx))
-  jaccard.weighted <- length(intersect(model.BMA, trueidx)) / length(union(model.BMA, trueidx))
-
-  nvarsMAP <- length(model.MAP)
-  includeMAP <- ifelse (all(trueidx %in% model.MAP), 1, 0)
-  fdrMAP <- sum(!(model.MAP %in% trueidx), na.rm = T)/length(model.MAP)
-  fnrMAP <- (length(trueidx) - length(intersect(model.MAP, trueidx)))/(length(trueidx))
-  jaccardMAP <- length(intersect(model.MAP, trueidx)) / length(union(model.MAP, trueidx))
+  MIP.MAP <- MIP[model.MAP]
+  MIP.WAM <- MIP[model.WAM]
+  models <- list(model.WAM=model.WAM, model.MAP=model.MAP)
 
   result$models <- models
-  result$betaMAP <- beta.mode
-  result$betaWeighted <- beta.weighted
-  result$BMA$nvars <- nvarsBMA
-  result$MAP$nvars <- nvarsMAP
-  result$BMA$fdr <- fdrBMA
-  result$MAP$fdr <- fdrMAP
-  result$BMA$fnr <- fnrBMA
-  result$MAP$fnr <- fnrMAP
-  result$BMA$include <- includeBMA
-  result$MAP$include <- includeMAP
-  result$BMA$Jaccard <- jaccard.weighted
-  result$MAP$Jaccard <- jaccardMAP
+  result$betaMAP <- beta.MAP
+  result$betaWAM <- beta.WAM
+  result$WAM$MIP <- MIP.WAM
+  result$MAP$MIP <- MIP.MAP
+  result$MAP$post.prob <- logp.best
+  result$model.explored <- modelSparse
+  result$logp_uniq <- logp.uniq
+  result$logp_path <- logp
+
   return(result)
 }
 

@@ -15,4 +15,5 @@ importFrom("methods", "as")
 
 export(bis)
 export(mybsvs)
-export(bsvs2_temp)
+export(logp.u)
+export(predict.bsvs)
