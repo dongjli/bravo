@@ -2,8 +2,8 @@ Package: bsvs
 Type: Package
 Title: Bayesian Screening and Variable Selection
 Version: 2.0.0
-Author: Somak Dutta [aut, cre],
-  Dongjin Li [aut]
+Author: Dongjin Li [aut, cre],
+  Somak Dutta [aut]
   Vivekananda Roy [ctb]
 Maintainer: Dongjin Li <dongjl@iastate.edu>
 Description: Performs Bayesian iterated screening and/or variable selection for ultra-high dimensional Gaussian linear regression models.
