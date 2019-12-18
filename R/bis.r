@@ -57,7 +57,8 @@ bis <- function(X,y,lam=nrow(X)/ncol(X)^2,criteria="n")
   
   
   chol.factor = matrix(NA,max.var,max.var)
-  v0 = numeric(max.var)
+  sumv02 = 0
+  logdetR = 0;
   sts = numeric(p)
   u   = numeric(p)
   
@@ -80,7 +81,7 @@ bis <- function(X,y,lam=nrow(X)/ncol(X)^2,criteria="n")
     #                R0 = R0, v0 = v0,D = D,xbar = xbar)
     
     
-    # Compute X0 solve( X0'X0 + lam*I  , X0'xj)
+    # Compute X0 solve( X0'X0 + lam*I  , X0'xj) 
     model.cur = model[1:{ii-1}
     X0 = X[,model.cur],drop=FALSE]
     xjc = (X[,j] - xbar[j])*D[j]
@@ -93,7 +94,16 @@ bis <- function(X,y,lam=nrow(X)/ncol(X)^2,criteria="n")
     
     Xtz = D*crossprod(X,temp4)
     
-    sts = sts - 
+    g = Xtz/chol.factor[ii-1,ii-1]
+    sts = sts + g^2; 
+    
+    s1 = sqrt(xtx + lam - sts);
+    
+    sumv02 = sumv02 + u[j]^2
+    logdetR = logdetR + log(chol.factor)
+    u = {u*s0 - u[j]*g}/s1
+    
+    RSS 
     
     j = this$which.max
     if(this$logp[j] < postprob[ii])      break;
