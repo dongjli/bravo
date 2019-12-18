@@ -56,11 +56,12 @@ bis <- function(X,y,lam=nrow(X)/ncol(X)^2,criteria="n")
   
   
   
-  chol.factor = matrix(NA,max.var,max.var)
+  R = matrix(NA,max.var,max.var)
   sumv02 = 0
   logdetR = 0;
-  sts = numeric(p)
+  z = numeric(p)
   u   = numeric(p)
+  v = numeric(max.var)
   
   
   postprob[1] = -0.5*(n-1)*log(n) # The posterior probability of the null model
@@ -68,23 +69,53 @@ bis <- function(X,y,lam=nrow(X)/ncol(X)^2,criteria="n")
   
   
   # First variable
-  chol.factor[1,1] = sqrt(xtx + lam)
-  logp <- 0.5*log(lam)-0.5*log(xtx+lam)-0.5*(n-1)*log(yty - (xty/chol.factor[1,1])^2)
+  b0 = sqrt(xtx + lam)
+  logdetR = log(R[1,1])
+  logp <- 0.5*log(lam)-logdetR - 0.5*(n-1)*log(yty - (xty/b0)^2)
 
   j = which.max(logp)
   model[1] = j;
   postprob[2] = logp[j]
   
-  for(ii in 2:max.var)
+  # Need to do the second variable by hand
+  if(max.var >= 2)
   {
-    # this <- addvar(model = model,x = X, ys = ys, xty = Xty, lam = lam, w = w,
-    #                R0 = R0, v0 = v0,D = D,xbar = xbar)
-    
-    
-    # Compute X0 solve( X0'X0 + lam*I  , X0'xj) 
-    model.cur = model[1:{ii-1}
-    X0 = X[,model.cur],drop=FALSE]
+    R[1,1] = b0;
     xjc = (X[,j] - xbar[j])*D[j]
+    v[1] = xty[j]/R[1,1]
+    sumv2 = v[1]^2
+    
+    S = D*crossprod(X,xjc)/R[1,1]
+    z = S^2
+    
+    w = sqrt(xtx+lam - z)
+    u = {Xty - v[1]*S}/w;
+    
+    RSS = yty - sumv2 - u^2
+    RSS[j] = Inf
+    logp = 0.5*log(lam) - logdetR - log(w) - 0.5*{n-1}*log(RSS)
+    
+    j = which.max(logp)
+    model[2] = j
+    postprob[3] = logp[j]
+    
+  }
+  
+  
+  
+  
+  for(ii in 3:max.var)
+  {
+
+    model.cur = model[1:{ii-1}
+    
+    X1 = X[,model.cur],drop=FALSE]
+    D1 = D[model.cur]
+    Xbar1 = xbar[model.cur]
+    xjc = (X[,j] - xbar[j])*D[j]
+    
+    a1 = backsolve(R,D1*crossprod(X1,xjc)
+    
     X0txj = crossprod(X0 , xjc)
     temp1 = backsolve(chol.factor,X0txj,transpose = TRUE,k = ii-1L)
     temp2 = D[model.cur] * backsolve(chol.factor,temp1,k = ii-1L)
@@ -100,18 +131,27 @@ bis <- function(X,y,lam=nrow(X)/ncol(X)^2,criteria="n")
     s1 = sqrt(xtx + lam - sts);
     
     sumv02 = sumv02 + u[j]^2
-    logdetR = logdetR + log(chol.factor)
+    logdetR = logdetR + log(chol.factor[ii-1,ii-1])
     u = {u*s0 - u[j]*g}/s1
     
-    RSS 
+    RSS = yty - sumv02 - u^2;
+    RSS[model.cur] = Inf
+    logp = -ii*loglam - logdetR - log(s0) - 0.5*(n-1)*log(RSS)
     
+    j = which.max(logp)
+
     j = this$which.max
-    if(this$logp[j] < postprob[ii])      break;
-    cat(j,", ",sep = "")
-    postprob[ii+1] <- this$logp[j]
-    model = c(model,j)
-    R0 = this$R
-    v0 = this$v
+    
+    postprob[ii] <- this$logp[j]
+    model[ii] = j
+    
+    if(ii < max.var)
+    {
+      chol.factor[1:ii,ii] = ?
+      chol.factor[ii,ii] = ?
+      
+     }
+    
   }
   cat(" Done.\n")
   
