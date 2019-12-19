@@ -25,7 +25,7 @@
 #'  is the last one included by either "PP" or "eBIC" if criteria="both" was selected}
 #' @export
 
-bis2 <- function(X,y,lam=nrow(X)/ncol(X)^2,criteria="n")
+bis <- function(X,y,lam=1)
 {
   p = ncol(X)
   n = nrow(X)
@@ -64,29 +64,29 @@ bis2 <- function(X,y,lam=nrow(X)/ncol(X)^2,criteria="n")
   v = numeric(max.var)
   
   
-  postprob[1] = -0.5*(n-1)*log(n) # The posterior probability of the null model
+  postprob[1] = -0.5*(n-1)*log(yty) # The posterior probability of the null model
   cat("\n Including: ")
-  
+  # cat(postprob[1],", ")
   
   # First variable
   b0 = sqrt(xtx + lam)
-  logdetR = b0
-  logp <- 0.5*log(lam)-logdetR - 0.5*(n-1)*log(yty - (xty/b0)^2)
-
+  logdetR = log(b0)
+  logp <- 0.5*log(lam)-logdetR - 0.5*(n-1)*log(yty - (xty/b0)^2) #+ logw
+  
   j = which.max(logp)
   cat(j)
   model[1] = j;
   postprob[2] = logp[j]
-  
+  # cat(" ,",logp[j],"\n")
   # Need to do the second variable by hand
   if(max.var >= 2)
   {
     R[1,1] = b0;
     xjc = (X[,j] - xbar[j])*D[j]
-    v[1] = xty[j]/R[1,1]
+    v[1] = xty[j]/b0
     sumv2 = v[1]^2
     
-    S = D*crossprod(X,xjc)/R[1,1]
+    S = D*crossprod(X,xjc)/b0
     z = S^2
     
     w1 = sqrt(xtx+lam - z)
@@ -94,88 +94,81 @@ bis2 <- function(X,y,lam=nrow(X)/ncol(X)^2,criteria="n")
     
     RSS = yty - sumv2 - u^2
     RSS[j] = Inf
-    logp = 0.5*log(lam) - logdetR - log(w1) - 0.5*{n-1}*log(RSS)
+    logp = 0.5*2*log(lam) - logdetR - log(w1) - 0.5*{n-1}*log(RSS) #+ 2*logw
     
     j = which.max(logp)
     cat(", ",j)
     model[2] = j
     postprob[3] = logp[j]
-    cat(" ,",logp[j],"\n")
+    # cat(" ,",logp[j],"\n")
   }
   
   
   
-  
-  for(ii in 3:max.var)
+  if(max.var > 3)
   {
-    
-    model.prev = model[1:{ii-2}]
-    
-    
-    xjc = (X[,j] - xbar[j])*D[j]
-    
-    
-    X1 = X[,model.prev,drop=FALSE]
-    D1 = D[model.prev]
-    Xbar1 = xbar[model.prev]
-    a1 = backsolve(R,D1*crossprod(X1,xjc),k = ii-2,transpose = T)
-    b1 = w1[j]
-    logdetR = logdetR + log(b1)
-    
-    v[ii-1] = u[j];
-    sumv2 = sumv2 + u[j]^2
-    
-    
-    temp1 = D1*backsolve(R,a1,transpose = TRUE,k = ii-2)
-    temp2 = xjc - X1 %*% temp1;
-    temp2 = temp2 - mean(temp2)
-    
-    eta = D*crossprod(X,temp2)
-    eta = eta/b1
-    
-    
-    z = z + eta^2
-    
-    temp3  = xtx + lam - z;
-    temp3[model[1:{ii-1}]] = 0;
-    w2 = sqrt(temp3)
-    u = {u*w1 - u[j]*eta}/w2;
-    w1 = w2;
-    
-    
-    RSS = yty - sumv2 - u^2
-    RSS[model[1:{ii-1}]] = Inf
-    logp = 0.5*log(lam) - logdetR - log(w1) - 0.5*{n-1}*log(RSS)
-    print(anyNA(logp))
-    j = which.max(logp)
-    
-    cat(", ",j)
-    postprob[ii+1] <- logp[j]
-    model[ii] = j
-    
-    
-    if(ii < max.var)
+    for(ii in 3:max.var)
     {
-      R[1:{ii-2},ii-1] = a1;
-      R[ii-1,ii-1] = b1;      
+      
+      model.prev = model[1:{ii-2}]
+      
+      
+      xjc = (X[,j] - xbar[j])*D[j]
+      
+      
+      X1 = X[,model.prev,drop=FALSE]
+      D1 = D[model.prev]
+      Xbar1 = xbar[model.prev]
+      a1 = backsolve(R,D1*crossprod(X1,xjc),k = ii-2,transpose = T)
+      # print(a1)
+      b1 = w1[j]
+      logdetR = logdetR + log(b1)
+      
+      v[ii-1] = u[j];
+      sumv2 = sumv2 + u[j]^2
+      
+      
+      temp1 = D1*backsolve(R,a1,transpose = FALSE,k = ii-2)
+      temp2 = xjc - X1 %*% temp1;
+      temp2 = temp2 - mean(temp2)
+
+      eta = D*crossprod(X,temp2)
+      eta = eta/b1
+      
+      
+      z = z + eta^2
+      
+      temp3  = xtx + lam - z;
+      temp3[model[1:{ii-1}]] = 1;
+      w2 = sqrt(temp3)
+      u = {u*w1 - u[j]*eta}/w2;
+      
+      
+      RSS = yty - sumv2 - u^2
+      RSS[model[1:{ii-1}]] = Inf
+      logp = 0.5*ii*log(lam) - logdetR - log(w2) - 0.5*{n-1}*log(RSS) #+ ii*logw
+      # print(anyNA(logp))
+      j = which.max(logp)
+      
+      cat(", ",j)
+      # cat(" ,",logp[j],"\n")
+      postprob[ii+1] <- logp[j]
+      model[ii] = j
+      
+      w1 = w2;
+      if(ii <= max.var)
+      {
+        R[1:{ii-2},ii-1] = a1;
+        R[ii-1,ii-1] = b1;      
+        # print(R[1:{ii-1},1:{ii-1}])
+      }
+      
     }
-    
   }
   cat(" Done.\n")
   
-  return(list(model.pp = model, postprobs=postprob))
+  return(list(model.pp = model, postprobs=postprob,lam=lam))
 }
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -243,3 +236,16 @@ bis2 <- function(X,y,lam=nrow(X)/ncol(X)^2,criteria="n")
 #   
 #   return(list(model.pp = model, postprobs=postprob[1:ii]))
 # }
+
+
+
+
+n = 500
+p = 100000
+x = matrix(rnorm(n*p),n,p)
+y = 1 + x[,1:5] %*% rep(3,5) + rnorm(n)
+tic()
+v = bis2(x,y,1)
+toc()
+
+
