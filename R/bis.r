@@ -25,7 +25,7 @@
 #'  is the last one included by either "PP" or "eBIC" if criteria="both" was selected}
 #' @export
 
-bis <- function(X,y,lam=nrow(X)/ncol(X)^2,criteria="n")
+bis2 <- function(X,y,lam=nrow(X)/ncol(X)^2,criteria="n")
 {
   p = ncol(X)
   n = nrow(X)
@@ -57,7 +57,7 @@ bis <- function(X,y,lam=nrow(X)/ncol(X)^2,criteria="n")
   
   
   R = matrix(NA,max.var,max.var)
-  sumv02 = 0
+  sumv2 = 0
   logdetR = 0;
   z = numeric(p)
   u   = numeric(p)
@@ -70,10 +70,11 @@ bis <- function(X,y,lam=nrow(X)/ncol(X)^2,criteria="n")
   
   # First variable
   b0 = sqrt(xtx + lam)
-  logdetR = log(R[1,1])
+  logdetR = b0
   logp <- 0.5*log(lam)-logdetR - 0.5*(n-1)*log(yty - (xty/b0)^2)
 
   j = which.max(logp)
+  cat(j)
   model[1] = j;
   postprob[2] = logp[j]
   
@@ -88,17 +89,18 @@ bis <- function(X,y,lam=nrow(X)/ncol(X)^2,criteria="n")
     S = D*crossprod(X,xjc)/R[1,1]
     z = S^2
     
-    w = sqrt(xtx+lam - z)
-    u = {Xty - v[1]*S}/w;
+    w1 = sqrt(xtx+lam - z)
+    u = {xty - v[1]*S}/w1;
     
     RSS = yty - sumv2 - u^2
     RSS[j] = Inf
-    logp = 0.5*log(lam) - logdetR - log(w) - 0.5*{n-1}*log(RSS)
+    logp = 0.5*log(lam) - logdetR - log(w1) - 0.5*{n-1}*log(RSS)
     
     j = which.max(logp)
+    cat(", ",j)
     model[2] = j
     postprob[3] = logp[j]
-    
+    cat(" ,",logp[j],"\n")
   }
   
   
@@ -106,56 +108,62 @@ bis <- function(X,y,lam=nrow(X)/ncol(X)^2,criteria="n")
   
   for(ii in 3:max.var)
   {
-
-    model.cur = model[1:{ii-1}
     
-    X1 = X[,model.cur],drop=FALSE]
-    D1 = D[model.cur]
-    Xbar1 = xbar[model.cur]
+    model.prev = model[1:{ii-2}]
+    
+    
     xjc = (X[,j] - xbar[j])*D[j]
     
-    a1 = backsolve(R,D1*crossprod(X1,xjc)
     
-    X0txj = crossprod(X0 , xjc)
-    temp1 = backsolve(chol.factor,X0txj,transpose = TRUE,k = ii-1L)
-    temp2 = D[model.cur] * backsolve(chol.factor,temp1,k = ii-1L)
-    temp3 = X0 %*% temp2 # the following is not needed as we are centering after two lines -sum(xbar[model.cur] * temp2)
-    temp4 = xjc - temp3;
-    temp4 = temp4 - mean(temp4)
+    X1 = X[,model.prev,drop=FALSE]
+    D1 = D[model.prev]
+    Xbar1 = xbar[model.prev]
+    a1 = backsolve(R,D1*crossprod(X1,xjc),k = ii-2,transpose = T)
+    b1 = w1[j]
+    logdetR = logdetR + log(b1)
     
-    Xtz = D*crossprod(X,temp4)
+    v[ii-1] = u[j];
+    sumv2 = sumv2 + u[j]^2
     
-    g = Xtz/chol.factor[ii-1,ii-1]
-    sts = sts + g^2; 
     
-    s1 = sqrt(xtx + lam - sts);
+    temp1 = D1*backsolve(R,a1,transpose = TRUE,k = ii-2)
+    temp2 = xjc - X1 %*% temp1;
+    temp2 = temp2 - mean(temp2)
     
-    sumv02 = sumv02 + u[j]^2
-    logdetR = logdetR + log(chol.factor[ii-1,ii-1])
-    u = {u*s0 - u[j]*g}/s1
+    eta = D*crossprod(X,temp2)
+    eta = eta/b1
     
-    RSS = yty - sumv02 - u^2;
-    RSS[model.cur] = Inf
-    logp = -ii*loglam - logdetR - log(s0) - 0.5*(n-1)*log(RSS)
     
+    z = z + eta^2
+    
+    temp3  = xtx + lam - z;
+    temp3[model[1:{ii-1}]] = 0;
+    w2 = sqrt(temp3)
+    u = {u*w1 - u[j]*eta}/w2;
+    w1 = w2;
+    
+    
+    RSS = yty - sumv2 - u^2
+    RSS[model[1:{ii-1}]] = Inf
+    logp = 0.5*log(lam) - logdetR - log(w1) - 0.5*{n-1}*log(RSS)
+    print(anyNA(logp))
     j = which.max(logp)
-
-    j = this$which.max
     
-    postprob[ii] <- this$logp[j]
+    cat(", ",j)
+    postprob[ii+1] <- logp[j]
     model[ii] = j
+    
     
     if(ii < max.var)
     {
-      chol.factor[1:ii,ii] = ?
-      chol.factor[ii,ii] = ?
-      
-     }
+      R[1:{ii-2},ii-1] = a1;
+      R[ii-1,ii-1] = b1;      
+    }
     
   }
   cat(" Done.\n")
   
-  return(list(model.pp = model, postprobs=postprob[1:ii]))
+  return(list(model.pp = model, postprobs=postprob))
 }
 
 
