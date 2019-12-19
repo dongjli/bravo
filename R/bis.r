@@ -240,12 +240,3 @@ bis <- function(X,y,lam=1)
 
 
 
-n = 500
-p = 500000
-x = matrix(rnorm(n*p),n,p)
-y = 1 + x[,1:5] %*% rep(3,5) + rnorm(n)
-tic()
-v = bis2(x,y,1)
-toc()
-
-
