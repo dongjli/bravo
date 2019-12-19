@@ -241,7 +241,7 @@ bis <- function(X,y,lam=1)
 
 
 n = 500
-p = 100000
+p = 500000
 x = matrix(rnorm(n*p),n,p)
 y = 1 + x[,1:5] %*% rep(3,5) + rnorm(n)
 tic()
