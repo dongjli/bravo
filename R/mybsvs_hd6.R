@@ -85,7 +85,7 @@ mybsvs <- function(X, y, w, lam, tmax=2, temp.multip=3, Miter=50, threhold=0.5) 
      m_i = model.top[, i]
      x.est <- cbind(rep(1, n), scale(X[, m_i], center = F, scale = 1/D[m_i]))
      beta <- solve(crossprod(x.est) + lam*diag(c(0, rep(1, size.top[i]))), crossprod(x.est, y))
-     beta.est[c(T, m_i), i] <- c(beta[1], beta[-1] * D[m_i])
+     beta.est[c(T, m_i), i] <- c(beta[1]-xbar*D[m_i], beta[-1] * D[m_i])
    }
   }
 
