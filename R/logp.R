@@ -43,7 +43,7 @@ logp.u <- function(model,X,y,lam,w)
   
   p0 = length(model)
   if(p0 == 0)
-    return( -0.5*(n-1)*log(n) );
+    return( -0.5*(n-1)*log(n-1) );
   
   x.g = scale(X[,model,drop=FALSE])
   

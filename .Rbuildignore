@@ -1,2 +1,4 @@
-^bsvs\.Rproj$
+^.*\.Rproj$
 ^\.Rproj\.user$
+^LICENSE\.md$
+.Rhistory
