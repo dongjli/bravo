@@ -25,15 +25,22 @@
 #'  is the last one included by either "PP" or "eBIC" if criteria="both" was selected}
 #' @export
 
-bis <- function(X,y,lam=1)
+bis <- function(X,y,lam=1, w=NULL, pp = FALSE,max.var = nrow(X))
 {
   p = ncol(X)
   n = nrow(X)
   ys = scale(y)
   
-  xbar = colMeans(X)
+  pp = (pp != 0);
+  
+  
   
   stopifnot(class(X) %in% c("dgCMatrix","matrix"))
+  stopifnot(max.var <= n && max.var < p)
+  if(!is.null(w)) stopifnot(w > 0 && w < 1)
+  logw = ifelse(is.null(w), 0, log(w/{1-w}))
+  
+  xbar = colMeans(X)
   
   if(class(X) == "dgCMatrix") {
     D = 1/sqrt(colMSD_dgc(X,xbar))
@@ -49,11 +56,8 @@ bis <- function(X,y,lam=1)
   xtx <- n - 1
   
   
-  max.var = n; # Intially allocate for maximum of n variables.
-  
   model = integer(n)
   postprob = numeric(max.var+1)
-  
   
   
   R = matrix(NA,max.var,max.var)
@@ -71,12 +75,18 @@ bis <- function(X,y,lam=1)
   # First variable
   b0 = sqrt(xtx + lam)
   logdetR = log(b0)
-  logp <- 0.5*log(lam)-logdetR - 0.5*(n-1)*log(yty - (xty/b0)^2) #+ logw
+  
+  logp <- 0.5*log(lam)-logdetR - 0.5*(n-1)*log(yty - (xty/b0)^2) + logw
+  
   
   j = which.max(logp)
   cat(j)
   model[1] = j;
   postprob[2] = logp[j]
+  if(postprob[2]<postprob[1] && pp){
+    cat(" Done.\n")
+    return(list(model.pp = NULL, postprobs=postprob[1],lam=lam))
+  }
   # cat(" ,",logp[j],"\n")
   # Need to do the second variable by hand
   if(max.var >= 2)
@@ -94,12 +104,18 @@ bis <- function(X,y,lam=1)
     
     RSS = yty - sumv2 - u^2
     RSS[j] = Inf
-    logp = 0.5*2*log(lam) - logdetR - log(w1) - 0.5*{n-1}*log(RSS) #+ 2*logw
+    
+    logp = 0.5*2*log(lam) - logdetR - log(w1) - 0.5*{n-1}*log(RSS) + 2*logw
     
     j = which.max(logp)
     cat(", ",j)
     model[2] = j
     postprob[3] = logp[j]
+    if(postprob[3]<postprob[2] && pp){
+      cat(" Done.\n")
+      return(list(model.pp = model[1:2], postprobs=postprob[1],lam=lam))
+    }
+    
     # cat(" ,",logp[j],"\n")
   }
   
@@ -131,7 +147,7 @@ bis <- function(X,y,lam=1)
       temp1 = D1*backsolve(R,a1,transpose = FALSE,k = ii-2)
       temp2 = xjc - X1 %*% temp1;
       temp2 = temp2 - mean(temp2)
-
+      
       eta = D*crossprod(X,temp2)
       eta = eta/b1
       
@@ -146,7 +162,9 @@ bis <- function(X,y,lam=1)
       
       RSS = yty - sumv2 - u^2
       RSS[model[1:{ii-1}]] = Inf
-      logp = 0.5*ii*log(lam) - logdetR - log(w2) - 0.5*{n-1}*log(RSS) #+ ii*logw
+      
+      logp = 0.5*ii*log(lam) - logdetR - log(w2) - 0.5*{n-1}*log(RSS) + ii*logw
+      
       # print(anyNA(logp))
       j = which.max(logp)
       
@@ -154,6 +172,10 @@ bis <- function(X,y,lam=1)
       # cat(" ,",logp[j],"\n")
       postprob[ii+1] <- logp[j]
       model[ii] = j
+      if(postprob[ii+1]<postprob[ii] && pp){
+        cat(" Done.\n")
+        return(list(model.pp = model[1:(ii-1)], postprobs=postprob[1:ii],lam=lam,w=w))
+      }
       
       w1 = w2;
       if(ii <= max.var)
@@ -167,7 +189,7 @@ bis <- function(X,y,lam=1)
   }
   cat(" Done.\n")
   
-  return(list(model.pp = model, postprobs=postprob,lam=lam))
+  return(list(model.pp = model, postprobs=postprob,lam=lam,w=w))
 }
 
 
