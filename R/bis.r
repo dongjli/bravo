@@ -79,7 +79,7 @@ bis <- function(X,y,lam=1, w=NULL, pp = FALSE,max.var = nrow(X))
   logp <- 0.5*log(lam)-logdetR - 0.5*(n-1)*log(yty - (xty/b0)^2) + logw
   
   
-  j = which.max(logp)
+  j = which.max(as.numeric(logp))
   cat(j)
   model[1] = j;
   postprob[2] = logp[j]
@@ -107,7 +107,7 @@ bis <- function(X,y,lam=1, w=NULL, pp = FALSE,max.var = nrow(X))
     
     logp = 0.5*2*log(lam) - logdetR - log(w1) - 0.5*{n-1}*log(RSS) + 2*logw
     
-    j = which.max(logp)
+    j = which.max(as.numeric(logp))
     cat(", ",j)
     model[2] = j
     postprob[3] = logp[j]
@@ -146,7 +146,7 @@ bis <- function(X,y,lam=1, w=NULL, pp = FALSE,max.var = nrow(X))
       
       temp1 = D1*backsolve(R,a1,transpose = FALSE,k = ii-2)
       temp2 = xjc - X1 %*% temp1;
-      temp2 = temp2 - mean(temp2)
+      temp2 = temp2 - mean(as.numeric(temp2))
       
       eta = D*crossprod(X,temp2)
       eta = eta/b1
@@ -166,7 +166,7 @@ bis <- function(X,y,lam=1, w=NULL, pp = FALSE,max.var = nrow(X))
       logp = 0.5*ii*log(lam) - logdetR - log(w2) - 0.5*{n-1}*log(RSS) + ii*logw
       
       # print(anyNA(logp))
-      j = which.max(logp)
+      j = which.max(as.numeric(logp))
       
       cat(", ",j)
       # cat(" ,",logp[j],"\n")
