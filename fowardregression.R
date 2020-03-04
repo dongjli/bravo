@@ -50,9 +50,9 @@ fr <- function(X,y,lam=0)
   xtx <- n - 1
   
   
-  max.var = n/2; # Intially allocate for maximum of n variables.
+  max.var = n-10; # Intially allocate for maximum of n variables.
   
-  model = integer(n)
+  model = integer(max.var)
   postprob = numeric(max.var+1)
   
   
@@ -174,8 +174,29 @@ fr <- function(X,y,lam=0)
   return(list(model.pp = model, postprobs=postprob,lam=lam))
 }
 
+PX <- function(X,y) crossprod(y,X)%*%solve(crossprod(X))%*%crossprod(X,y)
 
-
+bic <- function(X,y){
+  
+  #R <- solve(chol(crossprod(X)))
+  yty <- crossprod(y)
+  p = dim(X)[2]
+  n = dim(X)[1]
+  xty <- crossprod(X,y)
+  temp = 0
+  temp2 = Inf
+  for(i in 1:p){
+    temp = PX(X[,1:i],y)
+    temp3 <- log(yty - temp) + i * (log(n) + 2 * log(p)) / n
+    if (temp3>temp2){
+      return(i)
+    }
+    else{
+      temp2 = temp3
+    }
+  }
+  return(p)
+}
 
 
 
