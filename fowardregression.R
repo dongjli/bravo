@@ -37,7 +37,7 @@ fr <- function(X,y,lam=0, max.var = n-1)
   stopifnot(class(X) %in% c("dgCMatrix","matrix"))
   
   if(class(X) == "dgCMatrix") {
-    D = 1/sqrt(colMSD_dgc(X,xbar))
+    D = 1/sqrt(bsvs:::colMSD_dgc(X,xbar))
   }  else   {
     D = apply(X,2,sd)
     D = 1/D
