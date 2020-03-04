@@ -75,7 +75,7 @@ fr <- function(X,y,lam=0, max.var = n-1)
   #logp <- 0.5*log(lam)-logdetR - 0.5*(n-1)*log(yty - (xty/b0)^2) #+ logw
   logp <- -0.5*(n-1)*log(yty - (xty/b0)^2) #+ logw
   
-  j = which.max(logp)
+  j = which.max(as.numeric(logp))
   cat(j)
   model[1] = j;
   postprob[2] = logp[j]
@@ -99,7 +99,7 @@ fr <- function(X,y,lam=0, max.var = n-1)
     #logp = 0.5*2*log(lam) - logdetR - log(w1) - 0.5*{n-1}*log(RSS) #+ 2*logw
     logp = - 0.5*{n-1}*log(RSS) #+ 2*logw
     
-    j = which.max(logp)
+    j = which.max(as.numeric(logp))
     cat(", ",j)
     model[2] = j
     postprob[3] = logp[j]
@@ -152,7 +152,7 @@ fr <- function(X,y,lam=0, max.var = n-1)
       #logp = 0.5*ii*log(lam) - logdetR - log(w2) - 0.5*{n-1}*log(RSS) #+ ii*logw
       logp = - 0.5*{n-1}*log(RSS) #+ ii*logw
       # print(anyNA(logp))
-      j = which.max(logp)
+      j = which.max(as.numeric(logp))
       
       cat(", ",j)
       # cat(" ,",logp[j],"\n")
