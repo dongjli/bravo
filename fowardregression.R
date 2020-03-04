@@ -25,7 +25,7 @@
 #'  is the last one included by either "PP" or "eBIC" if criteria="both" was selected}
 #' @export
 
-fr <- function(X,y,lam=0)
+fr <- function(X,y,lam=0, max.var = n-1)
 {
   lam = 0
   p = ncol(X)
@@ -50,7 +50,7 @@ fr <- function(X,y,lam=0)
   xtx <- n - 1
   
   
-  max.var = n-10; # Intially allocate for maximum of n variables.
+  #max.var = n-10; # Intially allocate for maximum of n variables.
   
   model = integer(max.var)
   postprob = numeric(max.var+1)
