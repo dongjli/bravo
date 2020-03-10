@@ -1,6 +1,7 @@
 
 whichpartrev <- function(x, n=30) {
-  which(x >= -sort(-x, partial=n)[n])
+  #which(x >= -sort(abs(x), partial=n)[n])
+  return(order(abs(x),decreasing = T)[1:n])
 }
 
 sis <- function(X,y){
@@ -13,7 +14,7 @@ sis <- function(X,y){
   stopifnot(class(X) %in% c("dgCMatrix","matrix"))
   
   if(class(X) == "dgCMatrix") {
-    D = 1/sqrt(colMSD_dgc(X,xbar))
+    D = 1/sqrt(bsvs:::colMSD_dgc(X,xbar))
   }  else   {
     D = apply(X,2,sd)
     D = 1/D
@@ -25,15 +26,29 @@ sis <- function(X,y){
 }
 
 holp <- function(X,y){
+  stopifnot(class(X) %in% c("dgCMatrix","matrix"))
   p = ncol(X)
   n = nrow(X)
   ys = scale(y)
-  
   xbar = colMeans(X)
+  if(class(X) == "dgCMatrix") {
+    D = 1/sqrt(bsvs:::colMSD_dgc(X,xbar))
+  }  else   {
+    D = apply(X,2,sd)
+    D = 1/D
+  }
   
-  stopifnot(class(X) %in% c("dgCMatrix","matrix"))
   
-  beta <- crossprod(X,solve(tcrossprod(X),y))
+  XD = as.matrix(X %*% Diagonal(length(D),D))
+  S1 = tcrossprod(XD)
+  Z = as.numeric(X %*% (xbar*D))
+  XX = sweep(S1-Z+sum(xbar^2*D^2),1,Z,'-')
+  #temp = solve(XX,ys)
+  temp2 = ginv(XX)
+  temp  = temp2 %*% ys
+  
+  beta <- D * (crossprod(X,temp) - xbar * sum(temp))
+  #print(beta)
   return(whichpartrev(beta, n))
 }
 

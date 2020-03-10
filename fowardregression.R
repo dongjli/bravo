@@ -174,22 +174,30 @@ fr <- function(X,y,lam=0, max.var = n-1)
   return(list(model.pp = model, postprobs=postprob,lam=lam))
 }
 
-PX <- function(X,y) crossprod(y,X)%*%solve(crossprod(X))%*%crossprod(X,y)
+PX <- function(X,y) crossprod(y,X)%*%ginv(crossprod(X))%*%crossprod(X,y)
 
-bic <- function(X,y){
+bic <- function(X,y,gamma){
   
   #R <- solve(chol(crossprod(X)))
+  X = scale(as.matrix(X[,gamma,drop = F]))
+  y = scale(y)
   yty <- crossprod(y)
   p = dim(X)[2]
   n = dim(X)[1]
   xty <- crossprod(X,y)
   temp = 0
-  temp2 = Inf
+  temp2 = log(yty)
   for(i in 1:p){
     temp = PX(X[,1:i],y)
     temp3 <- log(yty - temp) + i * (log(n) + 2 * log(p)) / n
-    if (temp3>temp2){
-      return(i)
+    if (as.numeric(temp3)>as.numeric(temp2)){
+      #return(i-1)
+      if(i == 1){
+        return (integer(0))
+      }
+      else{
+        return (gamma[1:(i-1)])
+      }
     }
     else{
       temp2 = temp3
@@ -200,11 +208,52 @@ bic <- function(X,y){
 
 
 
+MSPE <- function(xtrain, xtest, ytrain, ytest,gamma){
+  if(length(gamma) == 0){
+    ybar = mean(ytrain)
+    return(list(mspe = as.numeric(mean(ytest-ybar)^2)),R2 = 0)
+  }
+  
+  xtrain1 = cbind(1,xtrain[,gamma,drop=FALSE])
+  
+  beta = solve(crossprod(xtrain1),crossprod(xtrain1,ytrain))
+  yhat = as.numeric(xtest[,gamma,drop=FALSE] %*% beta[-1] + beta[1])
+  res <- as.numeric(mean((ytest - yhat)^2))
+  return(list(mspe = res, r = cor(ytest,yhat)))
+}
 
 
 
-
-
+MSPE_B <- function(xtrain, xtest, ytrain, ytest,gamma,lam){
+  if(length(gamma) == 0){
+    ybar = mean(ytrain)
+    return(list(mspe = as.numeric(mean(ytest-ybar)^2)),R2 = 0)
+  }
+  
+  xtrain = xtrain[,gamma,drop = FALSE]
+  
+  xbar = colMeans(xtrain)
+  if(class(xtrain) == "dgCMatrix") {
+    D = 1/sqrt(bsvs:::colMSD_dgc(xtrain,xbar))
+  }  else   {
+    D = apply(xtrain,2,sd)
+    D = 1/D
+  }
+  
+  xbar_mat = matrix(rep(xbar, each = dim(xtrain)[1]), dim(xtrain)[1])
+  XD = cbind(rep(1, nrow(xtrain)),(xtrain - xbar_mat) %*% Diagonal(length(D),D))
+  lam_mat = lam * Diagonal(length(gamma)+1)
+  lam_mat[1,1] = 0
+  XX = crossprod(XD) + lam_mat
+  beta = solve(XX, crossprod(XD,ytrain))
+  
+  beta[1] = beta[1] - (D * xbar) %*% beta[-1]
+  beta[-1] = D * beta[-1]
+  
+  yhat = as.numeric(xtest[,gamma,drop=FALSE] %*% beta[-1] + beta[1])
+  res <- as.numeric(mean((ytest - yhat)^2))
+  return(list(mspe = res, r = cor(ytest,yhat)))
+}
 
 
 
