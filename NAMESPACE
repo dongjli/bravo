@@ -17,3 +17,4 @@ export(bis)
 export(mybsvs)
 export(logp.u)
 export(predict.bsvs)
+

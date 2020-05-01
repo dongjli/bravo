@@ -11,13 +11,12 @@ addvar <- function (model, x, ys, xty, lam, w, R0 = NULL, v0 = NULL, D,xbar,BugS
   logw <- log(w/(1-w))
 
   if (p0 == 0) { # There is no variable in the model
-    R1 <- sqrt(xtx+lam);
-    logp <- 0.5*log(lam)-0.5*log(xtx+lam)-0.5*(n-1)*log(yty - (xty/R1)^2) + logw
-
+    R1 <- sqrt(xtx+lam)
+    RSS <- yty - (xty/R1)^2
+    logp <- 0.5*log(lam)-0.5*log(xtx+lam)-0.5*(n-1)*log(RSS) + logw
     j = which.max(logp)
-
     return(list(logp=logp,R=sparseMatrix(i=1,j=1,x=R1,triangular=T),
-                v=xty[j]/R1,which.max=j))
+                v=xty[j]/R1,which.max=j, RSS=RSS))
   }
 
   # else there's at least one variable
@@ -77,7 +76,7 @@ addvar <- function (model, x, ys, xty, lam, w, R0 = NULL, v0 = NULL, D,xbar,BugS
     cat("Error in v = ",sum(abs(v1-v1exact)),"\n")
   }
 
-
-  return(list(logp=logp, R = R1,v=v1,which.max=j))
+  RSS[model] <- -Inf
+  return(list(logp=logp, R = R1, v=v1, which.max=j, RSS=RSS))
 }
 

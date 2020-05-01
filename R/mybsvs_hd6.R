@@ -30,6 +30,7 @@ mybsvs <- function(X, y, w, lam, tmax=2, temp.multip=3, Miter=50, threhold=0.5) 
   Xty = D*as.numeric(crossprod(X,ys))
 
   logp <- numeric(Miter * (tmax+1))
+  RSS <- numeric(Miter * (tmax+1))
   size <- integer(Miter * (tmax+1))
   indices <- integer(Miter*100)
 
@@ -38,6 +39,7 @@ mybsvs <- function(X, y, w, lam, tmax=2, temp.multip=3, Miter=50, threhold=0.5) 
   logp.best <- o$bestlogp
   r.idx.best <- o$bestidx
   logp[1:Miter] <- o$currlogp
+  RSS[1:Miter] <- o$currRSS
   size[1:Miter] <- o$modelsizes
   ed <- sum(size)
   indices[1:ed] <- o$curridx
@@ -51,6 +53,7 @@ mybsvs <- function(X, y, w, lam, tmax=2, temp.multip=3, Miter=50, threhold=0.5) 
     logp.best <- o$bestlogp
     r.idx.best <- o$bestidx
     logp[(Miter*t+1):(Miter*(t+1))] <- o$currlogp
+    RSS[(Miter*t+1):(Miter*(t+1))] <- o$currRSS
     size[(Miter*t+1):(Miter*(t+1))] <- o$modelsizes
     indices[(ed+1):(ed+sum(o$modelsizes))] <- o$curridx
     ed <- ed + sum(o$modelsizes)
@@ -71,6 +74,7 @@ mybsvs <- function(X, y, w, lam, tmax=2, temp.multip=3, Miter=50, threhold=0.5) 
   logp.top <- sort(logp.uniq[(logp.best-logp.uniq)<16], decreasing = T)
   cols.top <- unlist(lapply(logp.top, FUN=function(x){which(x==logp)[1]}))
   size.top <- size[cols.top]
+  RSS.top <- RSS[cols.top]
   model.top <- modelSparse[, cols.top, drop=F]
 
   logp.top <- logp.top-logp.best
@@ -85,7 +89,7 @@ mybsvs <- function(X, y, w, lam, tmax=2, temp.multip=3, Miter=50, threhold=0.5) 
      m_i = model.top[, i]
      x.est <- cbind(rep(1, n), scale(X[, m_i], center = F, scale = 1/D[m_i]))
      beta <- solve(crossprod(x.est) + lam*diag(c(0, rep(1, size.top[i]))), crossprod(x.est, y))
-     beta.est[c(T, m_i), i] <- c(beta[1]-xbar*D[m_i], beta[-1] * D[m_i])
+     beta.est[c(T, m_i), i] <- c(beta[1]-sum(beta[-1]*xbar[m_i]*D[m_i]), beta[-1] * D[m_i])
    }
   }
 
@@ -99,6 +103,12 @@ mybsvs <- function(X, y, w, lam, tmax=2, temp.multip=3, Miter=50, threhold=0.5) 
   MIP.WAM <- MIP[model.WAM]
   models <- list(model.WAM=model.WAM, model.MAP=model.MAP)
 
+  mtop.idx <- apply(model.top, 2 which)
+  model.union <- um=Reduce(union, mtop.idx)
+  Xm <- sparseMatrix(i = integer(0), j = integer(0), dims = c(n, ncovar))
+  Xm <- as(Xm, "dgCMatrix")
+  Xm[, model.union] <- X[, model.union, drop=F]
+
   result$models <- models
   result$betaMAP <- beta.MAP
   result$betaWAM <- beta.WAM
@@ -108,6 +118,13 @@ mybsvs <- function(X, y, w, lam, tmax=2, temp.multip=3, Miter=50, threhold=0.5) 
   result$model.explored <- modelSparse
   result$logp_uniq <- logp.uniq
   result$logp_path <- logp
+  result$logp_top <- logp.top
+  result$RSS_top<- RSS.top
+  result$weights <- weight
+  result$model_top <- model.top
+  result$Xm <- Xm
+  result$y <- y
+  result$lam <- lam
 
   return(result)
 }

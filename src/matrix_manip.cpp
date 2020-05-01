@@ -63,3 +63,29 @@ NumericVector colMSD_dgc(S4 mat,NumericVector m) {
   }
  return(y);
 }
+
+// [[Rcpp::export]]
+NumericVector colSUMIDX_dgc(S4 mat) {
+  IntegerVector dims = mat.slot("Dim");
+  int ncol = dims[1];
+
+  int *p = INTEGER(mat.slot("p"));
+  int *idx = INTEGER(mat.slot("i"));
+  double *x = REAL(mat.slot("x"));
+
+  NumericVector y(ncol);
+  for(int j=0;j<ncol;++j)
+  {
+    int rowidx_sum = 0;
+    int start = p[j];
+    int end = p[j+1];
+    for(int i=start;i<end;++i)
+    {
+      if(x[i] == 1) {
+        rowidx_sum += idx[i];
+      }	
+    }
+    y[j] =  rowidx_sum;
+  }
+ return(y);
+}

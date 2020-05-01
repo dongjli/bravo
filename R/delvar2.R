@@ -10,6 +10,7 @@ delvar1 <- function(model, x, xty, lam, w, D, xbar) {
     logp.del <- -(n-1)/2*log(yty)
   } else {
     logp.del <- numeric(p0)
+    RSS.del <- numeric(p0)
     x0 <- scale(x[, model, drop=F])
     xgx <- crossprod(x0) + lam*diag(p0)
     for (j in 1:p0) {
@@ -21,10 +22,13 @@ delvar1 <- function(model, x, xty, lam, w, D, xbar) {
       RSS0 <- yty - sum(backsolve(R0, xty[model.temp], transpose = T)^2)
       if(RSS0 <= 0) RSS0 = .Machine$double.eps
       logp.del[j] <- 0.5*(p0-1)*log(lam) - logdetR0 - 0.5*(n-1)*log(RSS0) + (p0-1)*logw
+      RSS.del[j] <- RSS0
     }
   }
   logp[model] <- logp.del
   logp[-model] <- -Inf
-  return(logp)
+  RSS.del[model] <- RSS.del
+  RSS.del[-model] <- -Inf
+  return(list(logp=logp, RSS=RSS.del))
 }
 delvar <- cmpfun(delvar1)
