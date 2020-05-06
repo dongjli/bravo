@@ -104,7 +104,7 @@ mybsvs <- function(X, y, w, lam, tmax=2, temp.multip=3, Miter=50, threhold=0.5) 
   models <- list(model.WAM=model.WAM, model.MAP=model.MAP)
 
   mtop.idx <- apply(model.top, 2, which)
-  model.union <- um=Reduce(union, mtop.idx)
+  model.union <- Reduce(union, mtop.idx)
   Xm <- sparseMatrix(i = integer(0), j = integer(0), dims = c(n, ncovar))
   Xm <- as(Xm, "dgCMatrix")
   Xm[, model.union] <- X[, model.union, drop=F]
