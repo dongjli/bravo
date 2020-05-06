@@ -42,7 +42,7 @@ addvar <- function (model, x, ys, xty, lam, w, R0 = NULL, v0 = NULL, D,xbar,BugS
 
   S <- S %*% Diagonal(p,x=D)
 
-  if(class(S) == "dgeMatrix") {
+  if(class(S)[1] == "dgeMatrix") {
     sts <- colSumSq_dge(S@x,S@Dim)
   } else {
     sts <- colSumSq_matrix(S)
