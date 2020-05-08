@@ -20,7 +20,7 @@ mybsvs <- function(X, y, w, lam, tmax=2, temp.multip=3, Miter=50, threhold=0.5) 
   ys = scale(y)
   xbar = colMeans(X)
 
-  stopifnot(class(X) %in% c("dgCMatrix","matrix"))
+  stopifnot(class(X)[1] %in% c("dgCMatrix","matrix"))
   if(class(X) == "dgCMatrix") {
     D = 1/sqrt(colMSD_dgc(X,xbar))
   }  else   {
