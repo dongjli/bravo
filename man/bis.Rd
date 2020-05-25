@@ -4,8 +4,7 @@
 \alias{bis}
 \title{Bayesian Iterated Screening (ultra-high, high or low dimensional).}
 \usage{
-bis(X, y, lam = nrow(X)/ncol(X)^2, w = sqrt(nrow(X))/ncol(X),
-  criteria = "PP")
+bis(X, y, lam = 1, w = NULL, pp = FALSE, max.var = nrow(X))
 }
 \arguments{
 \item{X}{An \eqn{n x p} matrix. Sparse matrices are supported and every

@@ -1,3 +1,5 @@
+### A function to compute the log (unormalized) posterior probabilities for all models
+### in the "swapped" set for the current model.
 swapvar <- function(model, x, ys, xty, lam, w, D, xbar, swapOnly=F) {
   n <- nrow(x)
   p <- ncol(x)
@@ -30,7 +32,7 @@ swapvar <- function(model, x, ys, xty, lam, w, D, xbar, swapOnly=F) {
         # add back another variable from the remaning variables
         S <- backsolve(R0, x0x[-j, , drop=F], transpose = T)
         if(length(model.temp) == 1) S = matrix(S, nrow = 1)
-        if(class(S) == "dgeMatrix") {
+        if(class(S)[1] == "dgeMatrix") {
           sts <- colSumSq_dge(S@x,S@Dim)
         } else {
           sts <- colSumSq_matrix(S)
@@ -83,7 +85,7 @@ swapvar <- function(model, x, ys, xty, lam, w, D, xbar, swapOnly=F) {
         # add back another variable from the remaning variables
         S <- backsolve(R0, x0x[-j, , drop=F], transpose = T)
         if(length(model.temp) == 1) S = matrix(S, nrow = 1)
-        if(class(S) == "dgeMatrix") {
+        if(class(S)[1] == "dgeMatrix") {
           sts <- colSumSq_dge(S@x,S@Dim)
         } else {
           sts <- colSumSq_matrix(S)
@@ -110,4 +112,4 @@ swapvar <- function(model, x, ys, xty, lam, w, D, xbar, swapOnly=F) {
   }
   return(list(logp=logp, RSS=RSS.mat))
 }
-swapvar <- cmpfun(swapvar)
+

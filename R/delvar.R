@@ -1,5 +1,6 @@
-# delete on variable, return logp
-delvar1 <- function(model, x, xty, lam, w, D, xbar) {
+### A function to compute the log (unormalized) posterior probabilities for all models
+### in the "deleted" set for the current model.
+delvar <- function(model, x, xty, lam, w, D, xbar) {
   n <- nrow(x)
   p <- ncol(x)
   p0 <- length(model)
@@ -31,4 +32,4 @@ delvar1 <- function(model, x, xty, lam, w, D, xbar) {
   RSS.del[-model] <- -Inf
   return(list(logp=logp, RSS=RSS.del))
 }
-delvar <- cmpfun(delvar1)
+

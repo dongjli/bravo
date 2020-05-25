@@ -1,34 +1,34 @@
-predict_bsvs <- function(object, Xnew, sim = FALSE, Nsim = 10000, alpha = 0.05) {
+predIntv <- function(object, Xnew, MC = FALSE, Nsim = 10000, conf.level = 0.95, alpha = 1-conf.level) {
   if (alpha < 0 | alpha > 1){
     stop("alpha has to be between 0 and 1")
   }
-  X <- object$Xm
-  y <- object$y
-  lam <- object$lam
-  
-  Models <- object$model_top
-  weights <- object$weights
-  RSS <- object$RSS_top
-  
+  X <- object$stats$Xm
+  y <- object$stats$y
+  lam <- object$stats$lam
+
+  Models <- object$model.top
+  weights <- object$stats$weights
+  RSS <- object$stats$RSS.top
+
   model.sim <- sample(1:length(weights), Nsim, prob = weights, replace = T)
   uni.model <- unique(model.sim)
-  
+
   n <- nrow(X)
+  p <- ncol(X)
   n.new <- nrow(Xnew)
-  p <- length(which(col.idX))
   Xbar <- colMeans(X)
-  if(class(X) == "dgCmatrix") {
+  if(class(X)[1] == "dgCmatrix") {
     D = 1/sqrt(colMSD_dgc(X, Xbar))
   }  else   {
     D = apply(X,2,sd)
     D = 1/D
   }
-  var_y <- var(y)
+  var_y <- as.vector(var(y))
   mean_y <- mean(y)
-  
-  if(sim) {
+
+  if(MC) {
     getR_a <- function(x, y, n, model.idx, lam) {
-      model <- which(Models[, model.idx, drop=F])
+      model <- which(Models[, model.idx])
       model.size <- length(model)
       xmat <- scale(x[, model, drop=F])
       A <- as.matrix(crossprod(xmat) + lam*diag(model.size))
@@ -36,12 +36,12 @@ predict_bsvs <- function(object, Xnew, sim = FALSE, Nsim = 10000, alpha = 0.05) 
       a = backsolve(R, crossprod(xmat, y), transpose = T)
       return(list(R=R, a=a))
     }
-    
+
     gen_newy <- function(nnew, xnew, RSS, mean_y, var_y, xbar, Ra, model.idx) {
       ### simulate sigma^2
-      sig2 <- rinvgamma(1, shape=(n-1)/2, rate=var_y*RSS[model.idx]/2)
+      sig2 <- 1/rgamma(1, shape=(n-1)/2, rate=var_y*RSS[model.idx]/2)
       ### simulate regression coefficients
-      model <- which(Models[, model.idx, drop=F])
+      model <- which(Models[, model.idx])
       model.size <- length(model)
       R <- Ra$R
       a <- Ra$a
@@ -54,7 +54,7 @@ predict_bsvs <- function(object, Xnew, sim = FALSE, Nsim = 10000, alpha = 0.05) 
       ynew <- beta0 + xnew %*% beta1 + rnorm(nnew, 0, sig)
       return(ynew)
     }
-    
+
     Ra_list <- lapply(sort(uni.model), FUN=getR_a, x=X, y=y, n=n, lam=lam)
     model.sim1 <- table(model.sim)
     ystar <- list()
@@ -65,17 +65,16 @@ predict_bsvs <- function(object, Xnew, sim = FALSE, Nsim = 10000, alpha = 0.05) 
                      xbar=Xbar, Ra=Ra_list[[i]], model.idx=as.numeric(names(n_models)))
       ystar <- append(ystar, ynew)
     }
-    
+
     ystar1 <- lapply(ystar, FUN = as.matrix)
     ynew_mat <- matrix(unlist(ystar1), ncol = Nsim)
     ci <- t(apply(ynew_mat, 1, FUN = quantile, probs=c(alpha/2, 1-alpha/2)))
-    
   } else {
     E = var_y * RSS / (n - 3)
     V = matrix(0, nrow = n.new, ncol = length(weights))
     U = matrix(0, nrow = n.new, ncol = length(weights))
     for (i in 1:length(weights)) {
-      model <- Models[, i, drop=F]
+      model <- Models[, i]
       Xnew_s <- scale(Xnew[, model, drop=F], center = Xbar[model], scale = 1/D[model])
       X_s <- scale(X[, model, drop=F], center = Xbar[model], scale = 1/D[model])
       E_m <- RSS[i] * var_y/(n-3)
@@ -84,12 +83,12 @@ predict_bsvs <- function(object, Xnew, sim = FALSE, Nsim = 10000, alpha = 0.05) 
       V[, i] <- as.numeric(Xnew_s %*% solve(A, crossprod(X_s, y)))
       U[, i] <- 1/n + rowSums((Xnew_s %*% backsolve(R, diag(sum(model))))^2)
     }
-    
+
     var_new = sum(E * weights) + rowSums((V - rowSums(V %*% diag(weights)))^2 %*% diag(weights)) + rowSums(U %*% diag(E * weights))
     mean_new = rowSums((mean_y + V) %*%  diag(weights))
     prec <- qnorm(1-alpha/2) * sqrt(var_new)
     ci <- cbind(mean_new-prec, mean_new+prec)
-  } 
-  colnames(ci) <- c("lower", "upper")
+  }
+  colnames(ci) <- c(paste0("lower ", conf.level*100, "%"), paste0("upper ", conf.level*100, "%"))
   return(ci)
 }

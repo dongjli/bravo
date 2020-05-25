@@ -7,7 +7,7 @@ using namespace Rcpp;
 
 // colSumSq_dge
 NumericVector colSumSq_dge(NumericVector x, IntegerVector dim);
-RcppExport SEXP _bsvs_colSumSq_dge(SEXP xSEXP, SEXP dimSEXP) {
+RcppExport SEXP _bravo_colSumSq_dge(SEXP xSEXP, SEXP dimSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -19,7 +19,7 @@ END_RCPP
 }
 // colSumSq_matrix
 NumericVector colSumSq_matrix(NumericMatrix x);
-RcppExport SEXP _bsvs_colSumSq_matrix(SEXP xSEXP) {
+RcppExport SEXP _bravo_colSumSq_matrix(SEXP xSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -30,7 +30,7 @@ END_RCPP
 }
 // colMSD_dgc
 NumericVector colMSD_dgc(S4 mat, NumericVector m);
-RcppExport SEXP _bsvs_colMSD_dgc(SEXP matSEXP, SEXP mSEXP) {
+RcppExport SEXP _bravo_colMSD_dgc(SEXP matSEXP, SEXP mSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -40,15 +40,27 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// colSUMIDX_dgc
+NumericVector colSUMIDX_dgc(S4 mat);
+RcppExport SEXP _bravo_colSUMIDX_dgc(SEXP matSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< S4 >::type mat(matSEXP);
+    rcpp_result_gen = Rcpp::wrap(colSUMIDX_dgc(mat));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_bsvs_colSumSq_dge", (DL_FUNC) &_bsvs_colSumSq_dge, 2},
-    {"_bsvs_colSumSq_matrix", (DL_FUNC) &_bsvs_colSumSq_matrix, 1},
-    {"_bsvs_colMSD_dgc", (DL_FUNC) &_bsvs_colMSD_dgc, 2},
+    {"_bravo_colSumSq_dge", (DL_FUNC) &_bravo_colSumSq_dge, 2},
+    {"_bravo_colSumSq_matrix", (DL_FUNC) &_bravo_colSumSq_matrix, 1},
+    {"_bravo_colMSD_dgc", (DL_FUNC) &_bravo_colMSD_dgc, 2},
+    {"_bravo_colSUMIDX_dgc", (DL_FUNC) &_bravo_colSUMIDX_dgc, 1},
     {NULL, NULL, 0}
 };
 
-RcppExport void R_init_bsvs(DllInfo *dll) {
+RcppExport void R_init_bravo(DllInfo *dll) {
     R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
     R_useDynamicSymbols(dll, FALSE);
 }

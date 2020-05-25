@@ -1,10 +1,8 @@
-Package: bsvs
+Package: bravo
 Type: Package
-Title: Bayesian Screening and Variable Selection
-Version: 2.0.0
-Author: Dongjin Li [aut, cre],
-  Somak Dutta [aut]
-  Vivekananda Roy [ctb]
+Title: Bayesian screening and variable selection
+Version: 1.0.0
+Author: Dongjin Li [aut, cre], Somak Dutta [aut], Vivekananda Roy [ctb], Run Wang [ctb]  
 Maintainer: Dongjin Li <dongjl@iastate.edu>
 Description: Performs Bayesian iterated screening and/or variable selection for ultra-high dimensional Gaussian linear regression models.
 License: GPL-3
@@ -14,5 +12,4 @@ Depends: R (>= 3.0.2), methods
 Imports: Rcpp (>= 1.0.2), Matrix (>= 1.2-17), compiler
 LinkingTo: Rcpp
 NeedsCompilation: yes
-RoxygenNote: 6.1.1
-
+RoxygenNote: 7.1.0

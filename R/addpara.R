@@ -7,4 +7,3 @@ addpara <- function(x, xty, model, lam, D, xbar) {
   return(list(R1=R1, v1=v1))
 }
 
-addpara <- cmpfun(addpara)
