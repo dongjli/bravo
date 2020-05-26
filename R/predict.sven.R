@@ -13,6 +13,7 @@
 #' @param MC only requeired if interval = TRUE. if TRUE, the function gives the Monte Carlo prediction
 #' interval. Default: TRUE.
 #' @param Nsim only required if MC = TRUE. The Monte Carlo sample size. Default: 10000.
+#' @param return.draws only required if MC = TRUE. if true, the Monte Carlo draws is returned.
 #' @param conf.level Confidence level of the interval. Default: 0.95.
 #' @param alpha Type one error rate. Default: 1-conf.level.
 #' @return The object returned depends on "interval" argumemt. If interval = TRUE, the object is an
@@ -42,13 +43,22 @@
 #' @method predict sven
 #' @export
 
-predict.sven <- function(object, Xnew, model="MAP", interval = FALSE, MC = FALSE,
+predict.sven <- function(object, Xnew, model="MAP", interval = FALSE, MC = FALSE, return.draws = FALSE,
                          Nsim = 10000, conf.level = 0.95, alpha = 1-conf.level) {
-  yhat <- predPoint(object = object, newx = Xnew, model = model)
+  y.pred <- predPoint(object = object, newx = Xnew, model = model)
   if (!interval){
-    return(yhat)
+    return(y.pred)
   } else {
-    CI <- predIntv(object = object, Xnew = Xnew, MC = MC, Nsim = Nsim, alpha = alpha)
-    return(cbind())
+    intv <- predIntv(object = object, Xnew = Xnew, MC = MC, Nsim = Nsim, 
+                     conf.level = conf.level, alpha = alpha)
+    if (return.draws){
+      prediction <- cbind(y.pred, intv$ci)
+      colnames(prediction) <- c("y.pred", colnames(intv$ci))
+      return(list(prediction = prediction, mc.draws = intv$mc.draws))
+    } else {
+      prediction <- cbind(y.pred, intv)
+      colnames(prediction) <- c("y.pred", colnames(intv))
+      return(prediction)
+    }
   }
 }

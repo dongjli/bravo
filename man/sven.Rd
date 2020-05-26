@@ -76,7 +76,6 @@ z = cbind(matrix(rep(zz, nonzero/3), nrow = n), z0)
 e = cbind(matrix(rnorm(n*nonzero, mean = 0, sd = 0.1), nrow = n), matrix(0, n, p-nonzero))
 X = z + e
 y <- 0.5 + X \%*\% TrueBeta + rnorm(n)
-
 res <- sven(X = X, y = y, lam = 200, w = 0.02, Ntemp = 9, Miter = 200)
 res$model.map # the MAP model
 res$model.wam # the WAM

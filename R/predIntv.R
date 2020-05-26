@@ -69,6 +69,8 @@ predIntv <- function(object, Xnew, MC = FALSE, Nsim = 10000, conf.level = 0.95, 
     ystar1 <- lapply(ystar, FUN = as.matrix)
     ynew_mat <- matrix(unlist(ystar1), ncol = Nsim)
     ci <- t(apply(ynew_mat, 1, FUN = quantile, probs=c(alpha/2, 1-alpha/2)))
+    colnames(ci) <- c(paste0("lower ", conf.level*100, "%"), paste0("upper ", conf.level*100, "%"))
+    return(list(ci=ci, mc.draws=ynew_mat))
   } else {
     E = var_y * RSS / (n - 3)
     V = matrix(0, nrow = n.new, ncol = length(weights))
@@ -83,12 +85,11 @@ predIntv <- function(object, Xnew, MC = FALSE, Nsim = 10000, conf.level = 0.95, 
       V[, i] <- as.numeric(Xnew_s %*% solve(A, crossprod(X_s, y)))
       U[, i] <- 1/n + rowSums((Xnew_s %*% backsolve(R, diag(sum(model))))^2)
     }
-
     var_new = sum(E * weights) + rowSums((V - rowSums(V %*% diag(weights)))^2 %*% diag(weights)) + rowSums(U %*% diag(E * weights))
     mean_new = rowSums((mean_y + V) %*%  diag(weights))
     prec <- qnorm(1-alpha/2) * sqrt(var_new)
     ci <- cbind(mean_new-prec, mean_new+prec)
+    colnames(ci) <- c(paste0("lower ", conf.level*100, "%"), paste0("upper ", conf.level*100, "%"))
+    return(ci)
   }
-  colnames(ci) <- c(paste0("lower ", conf.level*100, "%"), paste0("upper ", conf.level*100, "%"))
-  return(ci)
 }

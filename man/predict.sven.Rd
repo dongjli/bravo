@@ -10,6 +10,7 @@
   model = "MAP",
   interval = FALSE,
   MC = FALSE,
+  return.draws = FALSE,
   Nsim = 10000,
   conf.level = 0.95,
   alpha = 1 - conf.level
@@ -30,6 +31,8 @@ prediction. Default: TRUE.}
 
 \item{MC}{only requeired if interval = TRUE. if TRUE, the function gives the Monte Carlo prediction
 interval. Default: TRUE.}
+
+\item{return.draws}{only required if MC = TRUE. if true, the Monte Carlo draws is returned.}
 
 \item{Nsim}{only required if MC = TRUE. The Monte Carlo sample size. Default: 10000.}
 
