@@ -137,7 +137,7 @@ sven <- function(X, y, w = sqrt(nrow(X))/ncol(X), lam = nrow(X)/ncol(X)^2, Ntemp
      beta.est[1, i] <- beta
    } else {
      m_i = model.top[, i]
-     x.est <- cbind(rep(1, n), scale(X[, m_i], center = F, scale = 1/D[m_i]))
+     x.est <- cbind(rep(1, n), scale(X[, m_i], center = xbar[m_i], scale = 1/D[m_i]))
      beta <- solve(crossprod(x.est) + lam*diag(c(0, rep(1, size.top[i]))), crossprod(x.est, y))
      beta.est[c(T, m_i), i] <- c(beta[1]-sum(beta[-1]*xbar[m_i]*D[m_i]), beta[-1] * D[m_i])
    }
