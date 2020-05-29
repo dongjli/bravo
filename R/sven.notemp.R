@@ -7,6 +7,7 @@ sven.notemp <- function(xmat, ys, xty, lam, w, topKeep, D, xbar, n, ncovar, Mite
   end <- 1
 
   logp.curr <- as.numeric(-(n-1)/2*log(n-1))
+  logp.best <- logp.curr
 
   r <- addvar(model=NULL, x=xmat, ys=ys, xty=xty, lam=lam, w=w, D=D, xbar=xbar)
   res1 <- r$logp
@@ -21,8 +22,10 @@ sven.notemp <- function(xmat, ys, xty, lam, w, topKeep, D, xbar, n, ncovar, Mite
   RSS.curr <- RSS.k[s]
   rc.idx <- rc.k.idx[s]
 
-  logp.best <- logp.curr
-  r.idx.best <- rc.idx
+  if (logp.curr > logp.best) {
+    logp.best <- logp.curr
+    r.idx.best <- rc.idx
+  }
 
   currlogp[1] <- logp.curr
   currRSS[1] <- RSS.curr

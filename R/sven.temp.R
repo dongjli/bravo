@@ -21,6 +21,10 @@ sven.temp <- function(xmat, ys, xty, lam, w, topKeep, D, xbar, temp, stepsize, l
   logp.curr <- rc.k[s]
   RSS.curr <- RSS.k[s]
   rc.idx <- rc.k.idx[s]
+  if (logp.curr > logp.best) {
+    logp.best <- logp.curr
+    r.idx.best <- rc.idx
+  }
 
   para.add <- addpara(x=xmat, xty=xty, model=rc.idx, lam=lam, D=D, xbar=xbar)
 

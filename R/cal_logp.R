@@ -1,5 +1,5 @@
 #' Unnormalized log-posterior probability of a model.
-#' @rdname cal_logp
+#' @rdname logp.u
 #' @description Unnormalized log-posterior of a model.
 #' @param model An integer vector containing the model
 #' @param X  An \eqn{n x p} matrix. Sparse matrices are supported and every
