@@ -1,4 +1,4 @@
-predIntv <- function(object, Xnew, MC = FALSE, Nsim = 10000, conf.level = 0.95, alpha = 1-conf.level) {
+predIntv <- function(object, model, Xnew, MC = FALSE, Nsim = 10000, conf.level = 0.95, alpha = 1-conf.level) {
   if (alpha < 0 | alpha > 1){
     stop("alpha has to be between 0 and 1")
   }
@@ -8,6 +8,7 @@ predIntv <- function(object, Xnew, MC = FALSE, Nsim = 10000, conf.level = 0.95, 
 
   Models <- object$model.top
   weights <- object$stats$weights
+  if (model == "MAP") weights[-1] <- 0
   RSS <- object$stats$RSS.top
 
   model.sim <- sample(1:length(weights), Nsim, prob = weights, replace = T)

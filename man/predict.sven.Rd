@@ -2,7 +2,7 @@
 % Please edit documentation in R/predict.sven.R
 \name{predict.sven}
 \alias{predict.sven}
-\title{Bayesian Variable Selection (ultra-high, high or low dimensional).}
+\title{Make predictions from a fitted "sven" object.}
 \usage{
 \method{predict}{sven}(
   object,
@@ -49,6 +49,9 @@ point predicitons.
 \description{
 This function makes point predictions and computes prediction intervals
 from a fitted "sven" object.
+}
+\details{
+
 }
 \examples{
 n = 400; p = 20000; nonzero = 5

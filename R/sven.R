@@ -1,24 +1,57 @@
-#' Bayesian Variable Selection in Gaussian regression models
-#' (ultra-high, high or low dimensional).
+#' Selection of variables with embedded screening using Bayesian methods (SVEN) 
+#' in Gaussian linear models (ultra-high, high or low dimensional).
 #' @rdname sven
-#' @description This function performs Bayesian Variable Selection in Gaussian
-#' regression models
+#' @description SVEN is an approach to selecting variables with embedded screening 
+#' using Bayesian method. It is also a variable selection method in the spirit of 
+#' the stochastic shotgun search algorithm. However, by embedding a unique model 
+#' based screening and using fast Cholesky updates, SVEN produces a highly scalable 
+#' algorithm to explore gigantic model spaces and rapidly identify the regions of 
+#' high posterior probabilities. It outputs the log (unnormalized) posterior 
+#' probability of a set of best (highest probability) models. 
+#' For more details, see Li et al. (2020).
+#' 
 #' @param X The \eqn{\code{n} \times \code{p}} covariate matrix. Sparse matrices
 #' are supported and every care is taken not to make copies of this (typically)
 #' giant matrix. No need to center or scale.
 #' @param y The response vector of length \code{n}.
 #' @param w The prior inclusion probability of each variable. Default: \code{sqrt(n)/p}.
 #' @param lam The slab precision parameter. Default: \code{n/p^2}
-#' as suggested by the theory of Wang et al. (2019).
+#' as suggested by the theory of Li et al. (2020).
 #' @param Ntemp The number of temperatures. Default: 3.
 #' @param Tmax The maximum temperature. Default: log(log(\code{p}))+log(\code{p}).
 #' @param Miter The number of iteration. Default: 50.
-#' @param wam.threshold The threshold probablity to select the covariates for WAM.
+#' @param wam.threshold The threshold probability to select the covariates for WAM.
 #' A covariate will be included in WAM if its corresponding marginal inclusion
 #' probability is greater than the threshold. Default: 0.5.
-#' @param log.eps The tolerance Default: -16.
+#' @param log.eps The tolerance to choose the number of top models. Default: -16.
 #'
 #' @details
+#' SVEN is developed based on a hierarchical Gaussian linear model with priors placed 
+#' on the regression coefficients as well as on the model space. Degenerate spike priors 
+#' on inactive variables and Gaussian slab priors on active covariates makes the posterior 
+#' probability (up to a normalizing constant) of a model \eqn{P(\gamma|Y)} available in 
+#' explicit form. The variable selection starts from an empty model and update the model 
+#' according to the posterior probability of its neighboring models for some pre-specified 
+#' number of iterations. In each iteration, the models with large probabilities are screened 
+#' out in order to quickly identify the regions of high posterior probabilities. A temperature 
+#' schedule is used in order to recover models with large posterior probabilities and mitigate 
+#' posterior multimodality associated with variable selection models. The default maximum 
+#' temperature is guided by the posterior model selection consistency asymptotics in
+#' Li et al. (2020).
+#' 
+#' SVEN provides the maximum a posteriori (MAP) model as well as the weighted average model 
+#' (WAM). WAM is obtained in the following way: (1) keep the best (highest probability) \eqn{K} 
+#' models where \eqn{K} is chosen so that 
+#' \eqn{\log \left(P(\gamma^{(K)}|y)/P(\gamma^{(1)}|y)\right) > \code{log.eps}};
+#' (2) assign the weights \deqn{w_i = P(\gamma^{(i)}|y)/\sum_{k=1}^K P(\gamma^{(k)}|y)}
+#' to the model \eqn{\gamma^{(i)}}; (3) define the approximate marginal inclusion probabilities 
+#' for the \eqn{j}th variable as \deqn{\hat\pi_j = \sum_{k=1}^K w_k I(\gamma^{(k)}_j = 1)}. 
+#' Then, the WAM is defined as the model containing variables \eqn{j} with 
+#' \eqn{\hat\pi_j > \code{wam.threshold}}. SVEN also provides all the top \eqn{K} models which
+#' are stored in an \eqn{p \times K} sparse matrix, along with their corresponding log (unnormalized) 
+#' posterior probabilities. 
+#' 
+#' 
 #' @return A list with components
 #' \item{model.map}{A vector of indices corresponding to the selected variables
 #' in the MAP model.}
@@ -33,7 +66,7 @@
 #' to the MAP model.}
 #' \item{pprob.top}{A vector of the log (unnormalized) posterior probabilities
 #' corresponding to the top models.}
-#' \item{stats}{Additional sstatistics.}
+#' \item{stats}{Additional statistics.}
 #'
 #' @author Dongjin Li and Somak Dutta\cr Maintainer:
 #' Dongjin Li <dongjl@@iastate.edu>
