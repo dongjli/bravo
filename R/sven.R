@@ -45,7 +45,7 @@
 #' \eqn{\log \left(P(\gamma^{(K)}|y)/P(\gamma^{(1)}|y)\right) > \code{log.eps}};
 #' (2) assign the weights \deqn{w_i = P(\gamma^{(i)}|y)/\sum_{k=1}^K P(\gamma^{(k)}|y)}
 #' to the model \eqn{\gamma^{(i)}}; (3) define the approximate marginal inclusion probabilities 
-#' for the \eqn{j}th variable as \deqn{\hat\pi_j = \sum_{k=1}^K w_k I(\gamma^{(k)}_j = 1)}. 
+#' for the \eqn{j}th variable as \deqn{\hat\pi_j = \sum_{k=1}^K w_k I(\gamma^{(k)}_j = 1).} 
 #' Then, the WAM is defined as the model containing variables \eqn{j} with 
 #' \eqn{\hat\pi_j > \code{wam.threshold}}. SVEN also provides all the top \eqn{K} models which
 #' are stored in an \eqn{p \times K} sparse matrix, along with their corresponding log (unnormalized) 

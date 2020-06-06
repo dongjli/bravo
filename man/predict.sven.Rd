@@ -7,7 +7,7 @@
 \method{predict}{sven}(
   object,
   Xnew,
-  model = "MAP",
+  model = "WAM",
   interval = FALSE,
   MC = FALSE,
   return.draws = FALSE,
@@ -20,31 +20,36 @@
 \item{object}{A fitted "sven" object}
 
 \item{Xnew}{Matrix of new values for \code{X} at which predictions are to be made. Must be a matrix;
-can be sparse as in Matrix package}
+can be sparse as in Matrix package.}
 
 \item{model}{The model to be used to make point predictions. Model "MAP" gives the predictions calculated
 using coefficients estimated from the MAP model; model "WAM" gives the predictions calculated using
 coefficients estimated from the WAM. Default: "MAP".}
 
-\item{interval}{Logical; if true, the function gives the prediction interval in addition to the point
-prediction. Default: TRUE.}
+\item{interval}{Logical; if \code{TRUE}, the function gives the prediction interval in addition to the point
+prediction. Default: \code{FALSE}.}
 
-\item{MC}{only requeired if interval = TRUE. if TRUE, the function gives the Monte Carlo prediction
-interval. Default: TRUE.}
+\item{MC}{only required if \code{interval} = \code{TRUE}. if \code{TRUE}, the function gives the Monte Carlo prediction
+interval. Default: \code{FALSE}.}
 
-\item{return.draws}{only required if MC = TRUE. if true, the Monte Carlo draws is returned.}
+\item{return.draws}{only required if \code{MC} = \code{TRUE}. if \code{TRUE}, the Monte Carlo draws is returned.
+Default: \code{FALSE}.}
 
-\item{Nsim}{only required if MC = TRUE. The Monte Carlo sample size. Default: 10000.}
+\item{Nsim}{only required if \code{MC} = \code{TRUE}. The Monte Carlo sample size. Default: 10000.}
 
 \item{conf.level}{Confidence level of the interval. Default: 0.95.}
 
-\item{alpha}{Type one error rate. Default: 1-conf.level.}
+\item{alpha}{Type one error rate. Default: 1-\code{conf.level}.}
 }
 \value{
-The object returned depends on "interval" argumemt. If interval = TRUE, the object is an
-\eqn{\code{ncol(X)}\times 3} matrix with the point predicitons in the first column and the prediciton
-in the second and third columns; otherwise, the object is an \eqn{\code{ncol(X)}\times 1} vector of the
-point predicitons.
+The object returned depends on "interval" argument. If \code{interval} = \code{TRUE}, the object is an
+\eqn{\code{ncol(Xnew)}\times 3} matrix with the point predictions in the first column and the prediction
+in the second and third columns; otherwise, the object is an \eqn{\code{ncol(Xnew)}\times 1} vector of the
+point predictions.
+
+if return.draws is \code{TRUE}, a list with the following components is returned:
+\item{prediction}{vector or matrix as above}
+\item{mc.draws}{an \eqn{\code{ncol(Xnew)} \times \code{Nsim}} matrix of the Monte Carlo samples}
 }
 \description{
 This function makes point predictions and computes prediction intervals

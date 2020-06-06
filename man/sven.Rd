@@ -27,7 +27,7 @@ giant matrix. No need to center or scale.}
 \item{w}{The prior inclusion probability of each variable. Default: \code{sqrt(n)/p}.}
 
 \item{lam}{The slab precision parameter. Default: \code{n/p^2}
-as suggested by the theory of Wang et al. (2019).}
+as suggested by the theory of Li et al. (2020).}
 
 \item{Ntemp}{The number of temperatures. Default: 3.}
 
@@ -35,7 +35,7 @@ as suggested by the theory of Wang et al. (2019).}
 
 \item{Miter}{The number of iteration. Default: 50.}
 
-\item{wam.threshold}{The threshold probablity to select the covariates for WAM.
+\item{wam.threshold}{The threshold probability to select the covariates for WAM.
 A covariate will be included in WAM if its corresponding marginal inclusion
 probability is greater than the threshold. Default: 0.5.}
 
@@ -65,8 +65,8 @@ the stochastic shotgun search algorithm. However, by embedding a unique model
 based screening and using fast Cholesky updates, SVEN produces a highly scalable 
 algorithm to explore gigantic model spaces and rapidly identify the regions of 
 high posterior probabilities. It outputs the log (unnormalized) posterior 
-probability of a set of best (highest probability) models, as well as the marginal 
-inclusion probabilities corresponding to those models. For more details, see ...
+probability of a set of best (highest probability) models. 
+For more details, see Li et al. (2020).
 }
 \details{
 SVEN is developed based on a hierarchical Gaussian linear model with priors placed 
@@ -79,14 +79,16 @@ number of iterations. In each iteration, the models with large probabilities are
 out in order to quickly identify the regions of high posterior probabilities. A temperature 
 schedule is used in order to recover models with large posterior probabilities and mitigate 
 posterior multimodality associated with variable selection models. The default maximum 
-temperature is guided by the posterior model selection consistency asymptotics in (...).
+temperature is guided by the posterior model selection consistency asymptotics in
+Li et al. (2020).
 
 SVEN provides the maximum a posteriori (MAP) model as well as the weighted average model 
 (WAM). WAM is obtained in the following way: (1) keep the best (highest probability) \eqn{K} 
-models where \eqn{K} is chosen so that \eqn{P(\gamma^{(K)}|y)/P(\gamma^{(1)}|y) > \code{log.eps}};
-(2) assign the weights \eqn{w_i = P(\gamma^{(i)}|y)/\sum_{k=1}^K P(\gamma^{(k)}|y)}
+models where \eqn{K} is chosen so that 
+\eqn{\log \left(P(\gamma^{(K)}|y)/P(\gamma^{(1)}|y)\right) > \code{log.eps}};
+(2) assign the weights \deqn{w_i = P(\gamma^{(i)}|y)/\sum_{k=1}^K P(\gamma^{(k)}|y)}
 to the model \eqn{\gamma^{(i)}}; (3) define the approximate marginal inclusion probabilities 
-for the \eqn{j}th variable as \eqn{\hat\pi_j = \sum_{k=1}^K w_k I(\gamma^{(k)}_j = 1)}. 
+for the \eqn{j}th variable as \deqn{\hat\pi_j = \sum_{k=1}^K w_k I(\gamma^{(k)}_j = 1).} 
 Then, the WAM is defined as the model containing variables \eqn{j} with 
 \eqn{\hat\pi_j > \code{wam.threshold}}. SVEN also provides all the top \eqn{K} models which
 are stored in an \eqn{p \times K} sparse matrix, along with their corresponding log (unnormalized) 
