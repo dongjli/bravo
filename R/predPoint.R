@@ -1,4 +1,4 @@
-predPoint <- function(object, newx, model="MAP") {
+predPoint <- function(object, newx, model) {
   if(model=="MAP") {
     beta <- object$beta.map
   } else if (model=="WAM") {

@@ -57,8 +57,8 @@ predict.sven <- function(object, Xnew, model="WAM", interval = FALSE, MC = FALSE
   if (!interval){
     return(y.pred)
   } else {
-    intv <- predIntv(object = object, model = model, Xnew = Xnew, MC = MC, Nsim = Nsim, 
-                     conf.level = conf.level, alpha = alpha)
+    intv <- predIntv(object = object, model = model, Xnew = Xnew, MC = MC, Nsim = Nsim,
+                     return.draws = return.draws, conf.level = conf.level, alpha = alpha)
     if (return.draws){
       prediction <- cbind(y.pred, intv$ci)
       colnames(prediction) <- c("y.pred", colnames(intv$ci))

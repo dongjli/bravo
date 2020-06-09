@@ -1,4 +1,4 @@
-predIntv <- function(object, model, Xnew, MC = FALSE, Nsim = 10000, conf.level = 0.95, alpha = 1-conf.level) {
+predIntv <- function(object, model, Xnew, MC, Nsim, return.draws, conf.level, alpha) {
   if (alpha < 0 | alpha > 1){
     stop("alpha has to be between 0 and 1")
   }
@@ -18,7 +18,7 @@ predIntv <- function(object, model, Xnew, MC = FALSE, Nsim = 10000, conf.level =
   p <- ncol(X)
   n.new <- nrow(Xnew)
   Xbar <- colMeans(X)
-  if(class(X)[1] == "dgCmatrix") {
+  if(class(X)[1] == "dgCMatrix") {
     D = 1/sqrt(colMSD_dgc(X, Xbar))
   }  else   {
     D = apply(X,2,sd)
@@ -71,7 +71,11 @@ predIntv <- function(object, model, Xnew, MC = FALSE, Nsim = 10000, conf.level =
     ynew_mat <- matrix(unlist(ystar1), ncol = Nsim)
     ci <- t(apply(ynew_mat, 1, FUN = quantile, probs=c(alpha/2, 1-alpha/2)))
     colnames(ci) <- c(paste0("lower ", conf.level*100, "%"), paste0("upper ", conf.level*100, "%"))
-    return(list(ci=ci, mc.draws=ynew_mat))
+    if(mc.draws) {
+      return(list(ci=ci, mc.draws=ynew_mat))
+    } else {
+      return(ci)
+    }
   } else {
     E = var_y * RSS / (n - 3)
     V = matrix(0, nrow = n.new, ncol = length(weights))
