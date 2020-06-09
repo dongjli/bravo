@@ -71,7 +71,7 @@ predIntv <- function(object, model, Xnew, MC, Nsim, return.draws, conf.level, al
     ynew_mat <- matrix(unlist(ystar1), ncol = Nsim)
     ci <- t(apply(ynew_mat, 1, FUN = quantile, probs=c(alpha/2, 1-alpha/2)))
     colnames(ci) <- c(paste0("lower ", conf.level*100, "%"), paste0("upper ", conf.level*100, "%"))
-    if(mc.draws) {
+    if(return.draws) {
       return(list(ci=ci, mc.draws=ynew_mat))
     } else {
       return(ci)
