@@ -7,13 +7,12 @@
 \method{predict}{sven}(
   object,
   Xnew,
-  model = "WAM",
-  interval = FALSE,
-  MC = FALSE,
+  model = c("WAM", "MAP"),
+  interval = c("none", "MC", "Z"),
   return.draws = FALSE,
   Nsim = 10000,
-  conf.level = 0.95,
-  alpha = 1 - conf.level
+  level = 0.95,
+  alpha = 1 - level
 )
 }
 \arguments{
@@ -22,30 +21,29 @@
 \item{Xnew}{Matrix of new values for \code{X} at which predictions are to be made. Must be a matrix;
 can be sparse as in Matrix package.}
 
-\item{model}{The model to be used to make point predictions. Model "MAP" gives the predictions calculated
-using coefficients estimated from the MAP model; model "WAM" gives the predictions calculated using
-coefficients estimated from the WAM. Default: "MAP".}
+\item{model}{The model to be used to make predictions. Model "MAP" gives the predictions calculated
+using the MAP model; model "WAM" gives the predictions calculated using the WAM. Default: "WAM".}
 
-\item{interval}{Logical; if \code{TRUE}, the function gives the prediction interval in addition to the point
-prediction. Default: \code{FALSE}.}
+\item{interval}{Type of interval calculation. If \code{interval} = \code{"none"}, only point predictions are returned;
+if \code{interval} = \code{"MC"}, Monte Carlo prediction intervals are returned; if \code{interval} = \code{"Z"}, Z prediction 
+intervals are returned.}
 
-\item{MC}{only required if \code{interval} = \code{TRUE}. if \code{TRUE}, the function gives the Monte Carlo prediction
-interval. Default: \code{FALSE}.}
-
-\item{return.draws}{only required if \code{MC} = \code{TRUE}. if \code{TRUE}, the Monte Carlo draws is returned.
+\item{return.draws}{only required if \code{interval} = \code{"MC"}. if \code{TRUE}, the Monte Carlo samples are returned.
 Default: \code{FALSE}.}
 
-\item{Nsim}{only required if \code{MC} = \code{TRUE}. The Monte Carlo sample size. Default: 10000.}
+\item{Nsim}{only required if \code{interval} = \code{"MC"}. The Monte Carlo sample size. Default: 10000.}
 
-\item{conf.level}{Confidence level of the interval. Default: 0.95.}
+\item{level}{Confidence level of the interval. Default: 0.95.}
 
-\item{alpha}{Type one error rate. Default: 1-\code{conf.level}.}
+\item{alpha}{Type one error rate. Default: 1-\code{level}.}
+
+\item{...}{Further arguments passed to or from other methods.}
 }
 \value{
-The object returned depends on "interval" argument. If \code{interval} = \code{TRUE}, the object is an
-\eqn{\code{ncol(Xnew)}\times 3} matrix with the point predictions in the first column and the prediction
-in the second and third columns; otherwise, the object is an \eqn{\code{ncol(Xnew)}\times 1} vector of the
-point predictions.
+The object returned depends on "interval" argument. If \code{interval} = \code{"none"}, the object is an 
+\eqn{\code{ncol(Xnew)}\times 1} vector of the point predictions; otherwise, the object is an
+\eqn{\code{ncol(Xnew)}\times 3} matrix with the point predictions in the first column and the prediction intervals
+in the second and third columns.
 
 if return.draws is \code{TRUE}, a list with the following components is returned:
 \item{prediction}{vector or matrix as above}
@@ -71,10 +69,10 @@ res <- sven(X=X, y=y)
 newx <- matrix(rnorm(n*p), 200, p)
 # predicted values at a new data matrix using MAP model
 yhat <- predict(object = res, Xnew = newx, model = "MAP")
-# 95\% Monte Carlo prediction interval
-MC.interval <- predict(object = res, Xnew = newx, interval = TRUE, MC = TRUE, conf.level = 0.95)
-# 95\% Z-prediction interval
-Z.interval <- predict(object = res, Xnew = newx, interval = TRUE, conf.level = 0.95)
+# 95\% Monte Carlo prediction interval using WAM
+MC.interval <- predict(object = res, model = "WAM", Xnew = newx, interval = "MC", level = 0.95)
+# 95\% Z-prediction interval using MAP model
+Z.interval <- predict(object = res, model = "MAP", Xnew = newx, interval = "Z", level = 0.95)
 }
 \references{
 

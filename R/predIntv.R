@@ -1,4 +1,4 @@
-predIntv <- function(object, model, Xnew, MC, Nsim, return.draws, conf.level, alpha) {
+predIntv <- function(object, model, Xnew, interval, Nsim, return.draws, conf.level, alpha) {
   if (alpha < 0 | alpha > 1){
     stop("alpha has to be between 0 and 1")
   }
@@ -27,7 +27,7 @@ predIntv <- function(object, model, Xnew, MC, Nsim, return.draws, conf.level, al
   var_y <- as.vector(var(y))
   mean_y <- mean(y)
 
-  if(MC) {
+  if(interval == "MC") {
     getR_a <- function(x, y, n, model.idx, lam) {
       model <- which(Models[, model.idx])
       model.size <- length(model)
@@ -76,7 +76,7 @@ predIntv <- function(object, model, Xnew, MC, Nsim, return.draws, conf.level, al
     } else {
       return(ci)
     }
-  } else {
+  } else if(interval == "Z") {
     E = var_y * RSS / (n - 3)
     V = matrix(0, nrow = n.new, ncol = length(weights))
     U = matrix(0, nrow = n.new, ncol = length(weights))
