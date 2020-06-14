@@ -43,7 +43,7 @@
 #' res <- sven(X=X, y=y)
 #' newx <- matrix(rnorm(n*p), 200, p)
 #' # predicted values at a new data matrix using MAP model
-#' yhat <- predict(object = res, Xnew = newx, model = "MAP")
+#' yhat <- predict(object = res, Xnew = newx, model = "MAP", interval = "none")
 #' # 95% Monte Carlo prediction interval using WAM
 #' MC.interval <- predict(object = res, model = "WAM", Xnew = newx, interval = "MC", level = 0.95)
 #' # 95% Z-prediction interval using MAP model

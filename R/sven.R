@@ -30,7 +30,7 @@
 #' on the regression coefficients as well as on the model space. Degenerate spike priors 
 #' on inactive variables and Gaussian slab priors on active covariates makes the posterior 
 #' probability (up to a normalizing constant) of a model \eqn{P(\gamma|Y)} available in 
-#' explicit form. The variable selection starts from an empty model and update the model 
+#' explicit form. The variable selection starts from an empty model and updates the model 
 #' according to the posterior probability of its neighboring models for some pre-specified 
 #' number of iterations. In each iteration, the models with large probabilities are screened 
 #' out in order to quickly identify the regions of high posterior probabilities. A temperature 
