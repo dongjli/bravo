@@ -1,0 +1,44 @@
+[
+    {
+        "file": "/Users/liyangxiaobei/Desktop/Research/bravo/src/matrix_manip.cpp",
+        "file_last_write": 1579492758.0,
+        "definitions": [
+            {
+                "usr": "c:@F@colSumSq_dge#I#I#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "colSumSq_dge(Rcpp::NumericVector, Rcpp::IntegerVector)",
+                "file": "/Users/liyangxiaobei/Desktop/Research/bravo/src/matrix_manip.cpp",
+                "line": 4,
+                "column": 15
+            },
+            {
+                "usr": "c:@F@colSumSq_matrix#I#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "colSumSq_matrix(Rcpp::NumericMatrix)",
+                "file": "/Users/liyangxiaobei/Desktop/Research/bravo/src/matrix_manip.cpp",
+                "line": 23,
+                "column": 15
+            },
+            {
+                "usr": "c:@F@colMSD_dgc#I#I#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "colMSD_dgc(Rcpp::S4, Rcpp::NumericVector)",
+                "file": "/Users/liyangxiaobei/Desktop/Research/bravo/src/matrix_manip.cpp",
+                "line": 42,
+                "column": 15
+            },
+            {
+                "usr": "c:@F@colSUMIDX_dgc#I#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "colSUMIDX_dgc(Rcpp::S4)",
+                "file": "/Users/liyangxiaobei/Desktop/Research/bravo/src/matrix_manip.cpp",
+                "line": 68,
+                "column": 15
+            }
+        ]
+    }
+]

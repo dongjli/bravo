@@ -1,7 +1,4 @@
 predIntv <- function(object, model, Xnew, interval, Nsim, return.draws, conf.level, alpha) {
-  if (alpha < 0 | alpha > 1){
-    stop("alpha has to be between 0 and 1")
-  }
   X <- object$stats$Xm
   y <- object$stats$y
   lam <- object$stats$lam
@@ -10,9 +7,6 @@ predIntv <- function(object, model, Xnew, interval, Nsim, return.draws, conf.lev
   weights <- object$stats$weights
   if (model == "MAP") weights[-1] <- 0
   RSS <- object$stats$RSS.top
-
-  model.sim <- sample(1:length(weights), Nsim, prob = weights, replace = T)
-  uni.model <- unique(model.sim)
 
   n <- nrow(X)
   p <- ncol(X)
@@ -26,8 +20,10 @@ predIntv <- function(object, model, Xnew, interval, Nsim, return.draws, conf.lev
   }
   var_y <- as.vector(var(y))
   mean_y <- mean(y)
-
+  
   if(interval == "MC") {
+    model.sim <- sample(1:length(weights), Nsim, prob = weights, replace = T)
+    uni.model <- unique(model.sim)
     getR_a <- function(x, y, n, model.idx, lam) {
       model <- which(Models[, model.idx])
       model.size <- length(model)

@@ -6,19 +6,20 @@
 \usage{
 \method{predict}{sven}(
   object,
-  Xnew,
+  newdata,
   model = c("WAM", "MAP"),
   interval = c("none", "MC", "Z"),
   return.draws = FALSE,
   Nsim = 10000,
   level = 0.95,
-  alpha = 1 - level
+  alpha = 1 - level,
+  ...
 )
 }
 \arguments{
 \item{object}{A fitted "sven" object}
 
-\item{Xnew}{Matrix of new values for \code{X} at which predictions are to be made. Must be a matrix;
+\item{newdata}{Matrix of new values for \code{X} at which predictions are to be made. Must be a matrix;
 can be sparse as in Matrix package.}
 
 \item{model}{The model to be used to make predictions. Model "MAP" gives the predictions calculated
@@ -41,23 +42,20 @@ Default: \code{FALSE}.}
 }
 \value{
 The object returned depends on "interval" argument. If \code{interval} = \code{"none"}, the object is an 
-\eqn{\code{ncol(Xnew)}\times 1} vector of the point predictions; otherwise, the object is an
-\eqn{\code{ncol(Xnew)}\times 3} matrix with the point predictions in the first column and the prediction intervals
+\eqn{\code{ncol(newdata)}\times 1} vector of the point predictions; otherwise, the object is an
+\eqn{\code{ncol(newdata)}\times 3} matrix with the point predictions in the first column and the prediction intervals
 in the second and third columns.
 
 if return.draws is \code{TRUE}, a list with the following components is returned:
 \item{prediction}{vector or matrix as above}
-\item{mc.draws}{an \eqn{\code{ncol(Xnew)} \times \code{Nsim}} matrix of the Monte Carlo samples}
+\item{mc.draws}{an \eqn{\code{ncol(newdata)} \times \code{Nsim}} matrix of the Monte Carlo samples}
 }
 \description{
 This function makes point predictions and computes prediction intervals
 from a fitted "sven" object.
 }
-\details{
-
-}
 \examples{
-n = 400; p = 20000; nonzero = 5
+n = 80; p = 100; nonzero = 5
 trueidx <- 1:5
 nonzero.value <- c(0.50, 0.75, 1.00, 1.25, 1.50)
 TrueBeta = numeric(p)
@@ -68,14 +66,15 @@ y <- 0.5 + X \%*\% TrueBeta + rnorm(n)
 res <- sven(X=X, y=y)
 newx <- matrix(rnorm(n*p), 200, p)
 # predicted values at a new data matrix using MAP model
-yhat <- predict(object = res, Xnew = newx, model = "MAP")
+yhat <- predict(object = res, newdata = newx, model = "MAP", interval = "none")
 # 95\% Monte Carlo prediction interval using WAM
-MC.interval <- predict(object = res, model = "WAM", Xnew = newx, interval = "MC", level = 0.95)
+MC.interval <- predict(object = res, model = "WAM", newdata = newx, interval = "MC", level=0.95)
 # 95\% Z-prediction interval using MAP model
-Z.interval <- predict(object = res, model = "MAP", Xnew = newx, interval = "Z", level = 0.95)
+Z.interval <- predict(object = res, model = "MAP", newdata = newx, interval = "Z", level = 0.95)
 }
 \references{
-
+Li, D., Dutta, S., Roy, V.(2020) Model Based Screening Embedded Bayesian Variable Selection for Ultra-high 
+Dimensional Settings http://arxiv.org/abs/2006.07561
 }
 \author{
 Dongjin Li and Somak Dutta\cr Maintainer:

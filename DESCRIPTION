@@ -1,6 +1,6 @@
 Package: bravo
 Type: Package
-Title: Bayesian screening and variable selection
+Title: Bayesian Screening and Variable Selection
 Version: 1.0.0
 Author: Dongjin Li [aut, cre], Somak Dutta [aut], Vivekananda Roy [ctb], Run Wang [ctb]  
 Maintainer: Dongjin Li <dongjl@iastate.edu>

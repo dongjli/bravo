@@ -73,7 +73,7 @@ SVEN is developed based on a hierarchical Gaussian linear model with priors plac
 on the regression coefficients as well as on the model space. Degenerate spike priors 
 on inactive variables and Gaussian slab priors on active covariates makes the posterior 
 probability (up to a normalizing constant) of a model \eqn{P(\gamma|Y)} available in 
-explicit form. The variable selection starts from an empty model and update the model 
+explicit form. The variable selection starts from an empty model and updates the model 
 according to the posterior probability of its neighboring models for some pre-specified 
 number of iterations. In each iteration, the models with large probabilities are screened 
 out in order to quickly identify the regions of high posterior probabilities. A temperature 
@@ -95,20 +95,17 @@ are stored in an \eqn{p \times K} sparse matrix, along with their corresponding 
 posterior probabilities.
 }
 \examples{
-n = 400; p = 20000; nonzero = 15
-trueidx <- 1:15
-nonzero.value <- 3
-TrueBeta = numeric(ncovar)
+n=50; p=100; nonzero = 3
+trueidx <- 1:3
+nonzero.value <- 5
+TrueBeta <- numeric(p)
 TrueBeta[trueidx] <- nonzero.value
 
-# Generate a matrix with group structure
-z0 <- matrix(rnorm(n*(p-nonzero)), n, p-nonzero)
-zz = matrix(rnorm(3*n), n, 3)
-z = cbind(matrix(rep(zz, nonzero/3), nrow = n), z0)
-e = cbind(matrix(rnorm(n*nonzero, mean = 0, sd = 0.1), nrow = n), matrix(0, n, p-nonzero))
-X = z + e
+rho <- 0.6
+x1 <- matrix(rnorm(n*p), n, p)
+X <- sqrt(1-rho)*x1 + sqrt(rho)*rnorm(n)
 y <- 0.5 + X \%*\% TrueBeta + rnorm(n)
-res <- sven(X = X, y = y, lam = 200, w = 0.02, Ntemp = 9, Miter = 200)
+res <- sven(X=X, y=y)
 res$model.map # the MAP model
 res$model.wam # the WAM
 res$mip.map # the marginal inclusion probabilities of the variables in the MAP model
@@ -119,7 +116,8 @@ res$beta.map # the ridge estimator of regression coefficients in the MAP model
 res$beta.wam # the ridge estimator of regression coefficients in the WAM
 }
 \references{
-
+Li, D., Dutta, S., Roy, V.(2020) Model Based Screening Embedded Bayesian 
+Variable Selection for Ultra-high Dimensional Settings http://arxiv.org/abs/2006.07561
 }
 \author{
 Dongjin Li and Somak Dutta\cr Maintainer:
