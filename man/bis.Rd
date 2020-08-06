@@ -18,9 +18,10 @@ No need to center or scale.}
 \item{w}{The prior inclusion probability of each variable. Default: \code{sqrt(n)/p}
 as suggested by the theory of Wang et al. (2019).}
 
-\item{criteria}{The stopping criteria. Could be "PP" for
-posterior probability stopping rule, or "eBIC" for extended BIC stopping rule,
-or "both" (default). Note that for "eBIC" the value of \code{w} is not used.}
+\item{pp}{Booliean: If \code{FALSE} (default) the algorithm stops after including \code{max.var} many variables.
+If true, the posterior probability stopping rule is used.}
+
+\item{max.var}{The maximum number of variables to be included.}
 }
 \value{
 A list with components

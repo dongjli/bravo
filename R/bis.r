@@ -8,10 +8,9 @@
 #' @param lam The slab precision parameter. Default: \code{n/p^2}.
 #' @param w The prior inclusion probability of each variable. Default: \code{sqrt(n)/p}
 #' as suggested by the theory of Wang et al. (2019).
-#' @param criteria The stopping criteria. Could be "PP" for
-#' posterior probability stopping rule, or "eBIC" for extended BIC stopping rule,
-#' or "both" (default). Note that for "eBIC" the value of \code{w} is not used.
-#'
+#' @param pp Booliean: If \code{FALSE} (default) the algorithm stops after including \code{max.var} many variables.
+#' If true, the posterior probability stopping rule is used.
+#' @param max.var The maximum number of variables to be included.
 #' @return A list with components
 #' \item{model.pp}{An integer vector of screened model under posterior probability stopping rule.
 #'  This will be null if only "eBIC" stopping criterion was used.}

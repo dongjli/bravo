@@ -2,7 +2,7 @@
 #' in Gaussian linear models (ultra-high, high or low dimensional).
 #' @rdname sven
 #' @description SVEN is an approach to selecting variables with embedded screening 
-#' using Bayesian method. It is also a variable selection method in the spirit of 
+#' using a Bayesian hierarchical model. It is also a variable selection method in the spirit of 
 #' the stochastic shotgun search algorithm. However, by embedding a unique model 
 #' based screening and using fast Cholesky updates, SVEN produces a highly scalable 
 #' algorithm to explore gigantic model spaces and rapidly identify the regions of 
@@ -10,39 +10,52 @@
 #' probability of a set of best (highest probability) models. 
 #' For more details, see Li et al. (2020).
 #' 
-#' @param X The \eqn{\code{n} \times \code{p}} covariate matrix. Sparse matrices
-#' are supported and every care is taken not to make copies of this (typically)
-#' giant matrix. No need to center or scale.
-#' @param y The response vector of length \code{n}.
-#' @param w The prior inclusion probability of each variable. Default: \code{sqrt(n)/p}.
-#' @param lam The slab precision parameter. Default: \code{n/p^2}
+#' @param X The \eqn{n\times p} covariate matrix without intercept. The following classes are supported:
+#' \code{matrix} and \code{dgCMatrix}. Every care is taken not to make copies of this (typically)
+#' giant matrix. No need to center or scale this matrix manually. Scaling is performed implicitly and 
+#' regression coefficient are returned on the original scale.
+#' @param y The response vector of length \eqn{n}. No need to center or scale.
+#' @param w The prior inclusion probability of each variable. Default: \eqn{sqrt(n)/p}.
+#' @param lam The slab precision parameter. Default: \eqn{n/p^2}
 #' as suggested by the theory of Li et al. (2020).
 #' @param Ntemp The number of temperatures. Default: 3.
-#' @param Tmax The maximum temperature. Default: log(log(\code{p}))+log(\code{p}).
-#' @param Miter The number of iteration. Default: 50.
+#' @param Tmax The maximum temperature. Default: \eqn{\log\log p+\log p}.
+#' @param Miter The number of iterations per temperature. Default: \code{50}.
 #' @param wam.threshold The threshold probability to select the covariates for WAM.
 #' A covariate will be included in WAM if its corresponding marginal inclusion
 #' probability is greater than the threshold. Default: 0.5.
-#' @param log.eps The tolerance to choose the number of top models. Default: -16.
+#' @param log.eps The tolerance to choose the number of top models. See detail. Default: -16. 
 #'
 #' @details
 #' SVEN is developed based on a hierarchical Gaussian linear model with priors placed 
-#' on the regression coefficients as well as on the model space. Degenerate spike priors 
-#' on inactive variables and Gaussian slab priors on active covariates makes the posterior 
-#' probability (up to a normalizing constant) of a model \eqn{P(\gamma|Y)} available in 
-#' explicit form. The variable selection starts from an empty model and updates the model 
+#' on the regression coefficients as well as on the model space as follows:
+#' \deqn{y | X, \beta_0,\beta,\gamma,\sigma^2,w,\lambda \sim N(\beta_01 + X_\gamma\beta_\gamma,\sigma^2I_n)}
+#' \deqn{\beta_i|\beta_0,\gamma,\sigma^2,w,\lambda \stackrel{indep.}{\sim} N(0, \gamma_i\sigma^2/\lambda),~i=1,\ldots,p,}
+#' \deqn{(\beta_0,\sigma^2)|\gamma,w,p \sim p(\beta_0,\sigma^2) \propto 1/\sigma^2}
+#' \deqn{\gamma_i|w,\lambda \stackrel{iid}{\sim} Bernoulli(w)}
+#' where \eqn{X_\gamma} is the \eqn{n \times |\gamma|} submatrix of \eqn{X} consisting of 
+#' those columns of \eqn{X} for which \eqn{\gamma_i=1} and similarly, \eqn{\beta_\gamma} is the 
+#' \eqn{|\gamma|} subvector of \eqn{\beta} corresponding to \eqn{\gamma}.
+#' Degenerate spike priors on inactive variables and Gaussian slab priors on active 
+#' covariates makes the posterior 
+#' probability (up to a normalizing constant) of a model \eqn{P(\gamma|y)} available in 
+#' explicit form (Li et al., 2020).
+#' 
+#' The variable selection starts from an empty model and updates the model 
 #' according to the posterior probability of its neighboring models for some pre-specified 
 #' number of iterations. In each iteration, the models with large probabilities are screened 
 #' out in order to quickly identify the regions of high posterior probabilities. A temperature 
-#' schedule is used in order to recover models with large posterior probabilities and mitigate 
-#' posterior multimodality associated with variable selection models. The default maximum 
-#' temperature is guided by the posterior model selection consistency asymptotics in
-#' Li et al. (2020).
+#' schedule is used to facilitate exploration of models separated by valleys in the posterior 
+#' probability function, thus mitigate posterior multimodality associated with variable selection models.
+#' The default maximum temperature is guided by the posterior model selection consistency asymptotic results
+#' in Li et al. (2020).
 #' 
 #' SVEN provides the maximum a posteriori (MAP) model as well as the weighted average model 
 #' (WAM). WAM is obtained in the following way: (1) keep the best (highest probability) \eqn{K} 
-#' models where \eqn{K} is chosen so that 
-#' \eqn{\log \left(P(\gamma^{(K)}|y)/P(\gamma^{(1)}|y)\right) > \code{log.eps}};
+#' distinct models \eqn{\gamma^{(1)},\ldots,\gamma^{(K)}} with 
+#' \deqn{\log P\left(\gamma^{(1)}|y\right) \ge \cdots \ge \log P\left(\gamma^{(K)}|y\right)}
+#' where \eqn{K} is chosen so that 
+#' \eqn{\log \left\{P\left(\gamma^{(K)}|y\right)/P\left(\gamma^{(1)}|y\right)\right\} > \code{log.eps}};
 #' (2) assign the weights \deqn{w_i = P(\gamma^{(i)}|y)/\sum_{k=1}^K P(\gamma^{(k)}|y)}
 #' to the model \eqn{\gamma^{(i)}}; (3) define the approximate marginal inclusion probabilities 
 #' for the \eqn{j}th variable as \deqn{\hat\pi_j = \sum_{k=1}^K w_k I(\gamma^{(k)}_j = 1).} 
