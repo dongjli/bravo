@@ -1,7 +1,7 @@
 #' Bayesian Iterated Screening (ultra-high, high or low dimensional).
 #' @rdname bis
 #' @description Perform Bayesian iterated screening in Gaussian regression models
-#' @param X  An \eqn{n x p} matrix. Sparse matrices are supported and every
+#' @param X  An \eqn{n\times p} matrix. Sparse matrices are supported and every
 #' care is taken not to make copies of this (typically) giant matrix.
 #' No need to center or scale.
 #' @param y  The response vector of length \code{n}.

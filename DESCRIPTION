@@ -13,3 +13,4 @@ Imports: Rcpp (>= 1.0.2), Matrix (>= 1.2-17), compiler
 LinkingTo: Rcpp
 NeedsCompilation: yes
 RoxygenNote: 7.1.1
+Packaged: 2020-08-06 21:07:26 UTC; somakd

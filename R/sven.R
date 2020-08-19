@@ -43,11 +43,11 @@
 #' 
 #' The variable selection starts from an empty model and updates the model 
 #' according to the posterior probability of its neighboring models for some pre-specified 
-#' number of iterations. In each iteration, the models with large probabilities are screened 
+#' number of iterations. In each iteration, the models with small probabilities are screened 
 #' out in order to quickly identify the regions of high posterior probabilities. A temperature 
 #' schedule is used to facilitate exploration of models separated by valleys in the posterior 
 #' probability function, thus mitigate posterior multimodality associated with variable selection models.
-#' The default maximum temperature is guided by the posterior model selection consistency asymptotic results
+#' The default maximum temperature is guided by the asymptotic posterior model selection consistency results
 #' in Li et al. (2020).
 #' 
 #' SVEN provides the maximum a posteriori (MAP) model as well as the weighted average model 

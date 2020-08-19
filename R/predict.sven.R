@@ -20,8 +20,8 @@
 #' 
 #' @return The object returned depends on "interval" argument. If \code{interval} = \code{"none"}, the object is an 
 #' \eqn{\code{ncol(newdata)}\times 1} vector of the point predictions; otherwise, the object is an
-#' \eqn{\code{ncol(newdata)}\times 3} matrix with the point predictions in the first column and the prediction intervals
-#' in the second and third columns.
+#' \eqn{\code{ncol(newdata)}\times 3} matrix with the point predictions in the first column and the lower and upper bounds 
+#' of prediction intervals in the second and third columns, respectively.
 #' 
 #' if return.draws is \code{TRUE}, a list with the following components is returned:
 #' \item{prediction}{vector or matrix as above}

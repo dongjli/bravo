@@ -7,7 +7,7 @@
 bis(X, y, lam = 1, w = NULL, pp = FALSE, max.var = nrow(X))
 }
 \arguments{
-\item{X}{An \eqn{n x p} matrix. Sparse matrices are supported and every
+\item{X}{An \eqn{n\times p} matrix. Sparse matrices are supported and every
 care is taken not to make copies of this (typically) giant matrix.
 No need to center or scale.}
 
