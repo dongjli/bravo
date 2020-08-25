@@ -1,9 +1,7 @@
 useDynLib(bravo, .registration=TRUE)
 
-useDynLib(bravo, .registration=TRUE)
-
 importFrom(Rcpp, evalCpp)
-useDynLib(bravo, .registration = TRUE)
+
 
 importFrom("stats", "sd")
 
