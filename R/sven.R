@@ -107,7 +107,8 @@
 #' res$beta.wam # the ridge estimator of regression coefficients in the WAM
 #' @export
 sven <- function(X, y, w = sqrt(nrow(X))/ncol(X), lam = nrow(X)/ncol(X)^2, Ntemp = 3,
-                 Tmax = (log(log(ncol(X)))+log(ncol(X))), Miter = 50, wam.threshold = 0.5, log.eps = -16) {
+                 Tmax = (log(log(ncol(X)))+log(ncol(X))), Miter = 50, wam.threshold = 0.5, 
+                 log.eps = -16, verbose = TRUE) {
   result <- list()
   k=20
 
@@ -130,7 +131,7 @@ sven <- function(X, y, w = sqrt(nrow(X))/ncol(X), lam = nrow(X)/ncol(X)^2, Ntemp
   size <- integer(Miter * (Ntemp))
   indices <- integer(Miter*100)
 
-  cat("temperature = 1\n")
+  if (verbose) cat("temperature = 1\n")
   o <- sven.notemp(X, ys, Xty, lam, w, k, D, xbar, n, ncovar, Miter)
   logp.best <- o$bestlogp
   r.idx.best <- o$bestidx
@@ -142,7 +143,7 @@ sven <- function(X, y, w = sqrt(nrow(X))/ncol(X), lam = nrow(X)/ncol(X)^2, Ntemp
 
   stepsize <- Tmax/(Ntemp-1)
   for (t in 1:(Ntemp-1)) {
-    cat("temperature =", t*stepsize, "\n")
+    if (verbose) cat("temperature =", t*stepsize, "\n")
     o <- sven.temp(X, ys, Xty, lam, w, k, D, xbar, t, stepsize=stepsize, logp.best, r.idx.best, n, ncovar, Miter)
     logp.best <- o$bestlogp
     r.idx.best <- o$bestidx
