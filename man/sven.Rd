@@ -14,7 +14,8 @@ sven(
   Tmax = (log(log(ncol(X))) + log(ncol(X))),
   Miter = 50,
   wam.threshold = 0.5,
-  log.eps = -16
+  log.eps = -16,
+  verbose = TRUE
 )
 }
 \arguments{

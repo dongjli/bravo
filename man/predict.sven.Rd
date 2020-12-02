@@ -64,7 +64,7 @@ TrueBeta[trueidx] <- nonzero.value
 X <- matrix(rnorm(n*p), n, p)
 y <- 0.5 + X \%*\% TrueBeta + rnorm(n)
 res <- sven(X=X, y=y)
-newx <- matrix(rnorm(n*p), 20, p)
+newx <- matrix(rnorm(20*p), 20, p)
 # predicted values at a new data matrix using MAP model
 yhat <- predict(object = res, newdata = newx, model = "MAP", interval = "none")
 # 95\% Monte Carlo prediction interval using WAM
