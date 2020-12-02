@@ -10,7 +10,7 @@ importClassesFrom(Matrix, dgeMatrix, dgCMatrix, dsCMatrix,dtCMatrix)
 importFrom("methods", "as")
 importFrom("stats", "qnorm", "quantile", "rgamma", "rnorm", "var")
 
-#export(bis)
+export(bis)
 export(sven)
 export(predict.sven)
 S3method(predict,sven)

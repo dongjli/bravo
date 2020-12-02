@@ -34,7 +34,7 @@ bis <- function(X,y,lam=1, w=NULL, pp = FALSE,max.var = nrow(X))
   
   
   
-  stopifnot(class(X) %in% c("dgCMatrix","matrix"))
+  stopifnot(class(X)[1] %in% c("dgCMatrix","matrix"))
   stopifnot(max.var <= n && max.var < p)
   if(!is.null(w)) stopifnot(w > 0 && w < 1)
   logw = ifelse(is.null(w), 0, log(w/{1-w}))
