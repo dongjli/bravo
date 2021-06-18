@@ -42,6 +42,8 @@ A covariate will be included in WAM if its corresponding marginal inclusion
 probability is greater than the threshold. Default: 0.5.}
 
 \item{log.eps}{The tolerance to choose the number of top models. See detail. Default: -16.}
+
+\item{verbose}{If \code{TRUE}, the function prints the current temperature SVEN is at; the default is TRUE.}
 }
 \value{
 A list with components
