@@ -1,5 +1,5 @@
 #' Bayesian Iterated Screening (ultra-high, high or low dimensional).
-#' @rdname bis
+#' @rdname bits
 #' @description Perform Bayesian iterated screening in Gaussian regression models
 #' @param X  An \eqn{n\times p} matrix. Sparse matrices are supported and every
 #' care is taken not to make copies of this (typically) giant matrix.
@@ -24,7 +24,7 @@
 #'  is the last one included by either "PP" or "eBIC" if criteria="both" was selected}
 #' @export
 
-bis <- function(X,y,lam=1, w=NULL, pp = FALSE,max.var = nrow(X))
+bits <- function(X,y,lam=1, w=NULL, pp = FALSE,max.var = nrow(X))
 {
   p = ncol(X)
   n = nrow(X)
@@ -213,7 +213,7 @@ bis <- function(X,y,lam=1, w=NULL, pp = FALSE,max.var = nrow(X))
 
 
 
-# bis <- function(X,y,lam=nrow(X)/ncol(X)^2,w = sqrt(nrow(X))/ncol(X),criteria="PP")
+# bits <- function(X,y,lam=nrow(X)/ncol(X)^2,w = sqrt(nrow(X))/ncol(X),criteria="PP")
 # {
 #   p = ncol(X)
 #   n = nrow(X)
