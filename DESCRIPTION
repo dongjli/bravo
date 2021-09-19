@@ -4,7 +4,7 @@ Title: Bayesian Screening and Variable Selection
 Version: 2.0.0
 Author: Dongjin Li [aut, cre], Somak Dutta [aut], Vivekananda Roy [ctb]
 Maintainer: Dongjin Li <dongjl@iastate.edu>
-Description: Performs Bayesian variable selection with embedded screening for ultra-high dimensional Gaussian linear regression models. The methodology is described in Li, Dutta and Roy (2020) <arXiv:2006.07561>.
+Description: Performs Bayesian variable screening and selection for ultra-high dimensional linear regression models.
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
