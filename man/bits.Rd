@@ -39,3 +39,6 @@ A list with components
 \description{
 Perform Bayesian iterated screening in Gaussian regression models
 }
+\references{
+Wang, R., Dutta, S., Roy, V.(2021) Bayesian iterative screening in ultra-high dimensional settings https://arxiv.org/abs/2107.10175
+}
