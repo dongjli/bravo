@@ -21,6 +21,8 @@
 #' \item{ebics}{The sequence of eBIC values until the last included variable.
 #'  This will be null if only "PP" stopping criterion was used.  Here the last included variable
 #'  is the last one included by either "PP" or "eBIC" if criteria="both" was selected}
+#' @references Wang, R., Dutta, S., Roy, V.(2021) Bayesian iterative screening in ultra-high dimensional 
+#' settings https://arxiv.org/abs/2107.10175
 #' @export
 
 bits <- function(X,y,lam=1, w=NULL, pp = FALSE,max.var = nrow(X))
