@@ -24,7 +24,8 @@
 #' @param wam.threshold The threshold probability to select the covariates for WAM.
 #' A covariate will be included in WAM if its corresponding marginal inclusion
 #' probability is greater than the threshold. Default: 0.5.
-#' @param log.eps The tolerance to choose the number of top models. See detail. Default: -16. 
+#' @param log.eps The tolerance to choose the number of top models. See detail. Default: -16.
+#' @param L The minimum number of neighboring models screened. Default: 20.
 #' @param verbose If \code{TRUE}, the function prints the current temperature SVEN is at; the default is TRUE. 
 #'
 #' @details
@@ -109,9 +110,8 @@
 #' @export
 sven <- function(X, y, w = sqrt(nrow(X))/ncol(X), lam = nrow(X)/ncol(X)^2, Ntemp = 3,
                  Tmax = (log(log(ncol(X)))+log(ncol(X))), Miter = 50, wam.threshold = 0.5, 
-                 log.eps = -16, verbose = TRUE) {
+                 log.eps = -16, L = 20, verbose = TRUE) {
   result <- list()
-  k=20
 
   n <- length(y)
   ncovar <- ncol(X)
@@ -133,7 +133,7 @@ sven <- function(X, y, w = sqrt(nrow(X))/ncol(X), lam = nrow(X)/ncol(X)^2, Ntemp
   indices <- integer(Miter*100)
 
   if (verbose) cat("temperature = 1\n")
-  o <- sven.notemp(X, ys, Xty, lam, w, k, D, xbar, n, ncovar, Miter)
+  o <- sven.notemp(X, ys, Xty, lam, w, L, D, xbar, n, ncovar, Miter)
   logp.best <- o$bestlogp
   r.idx.best <- o$bestidx
   logp[1:Miter] <- o$currlogp
@@ -145,7 +145,7 @@ sven <- function(X, y, w = sqrt(nrow(X))/ncol(X), lam = nrow(X)/ncol(X)^2, Ntemp
   stepsize <- Tmax/(Ntemp-1)
   for (t in 1:(Ntemp-1)) {
     if (verbose) cat("temperature =", t*stepsize, "\n")
-    o <- sven.temp(X, ys, Xty, lam, w, k, D, xbar, t, stepsize=stepsize, logp.best, r.idx.best, n, ncovar, Miter)
+    o <- sven.temp(X, ys, Xty, lam, w, L, D, xbar, t, stepsize=stepsize, logp.best, r.idx.best, n, ncovar, Miter)
     logp.best <- o$bestlogp
     r.idx.best <- o$bestidx
     logp[(Miter*t+1):(Miter*(t+1))] <- o$currlogp

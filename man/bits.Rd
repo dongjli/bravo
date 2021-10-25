@@ -13,10 +13,9 @@ No need to center or scale.}
 
 \item{y}{The response vector of length \code{n}.}
 
-\item{lam}{The slab precision parameter. Default: \code{n/p^2}.}
+\item{lam}{The slab precision parameter. Default: \code{1}.}
 
-\item{w}{The prior inclusion probability of each variable. Default: \code{sqrt(n)/p}
-as suggested by the theory of Wang et al. (2019).}
+\item{w}{The prior inclusion probability of each variable. Default: \code{1/2}.}
 
 \item{pp}{Booliean: If \code{FALSE} (default) the algorithm stops after including \code{max.var} many variables.
 If true, the posterior probability stopping rule is used.}
@@ -40,5 +39,6 @@ A list with components
 Perform Bayesian iterated screening in Gaussian regression models
 }
 \references{
-Wang, R., Dutta, S., Roy, V.(2021) Bayesian iterative screening in ultra-high dimensional settings https://arxiv.org/abs/2107.10175
+Wang, R., Dutta, S., Roy, V.(2021) Bayesian iterative screening in ultra-high dimensional 
+settings https://arxiv.org/abs/2107.10175
 }
