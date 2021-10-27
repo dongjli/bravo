@@ -32,6 +32,21 @@ A list with components
 \description{
 Perform Bayesian iterated screening in Gaussian regression models
 }
+\examples{
+n=50; p=100; nonzero = 3
+trueidx <- 1:3
+nonzero.value <- 5
+TrueBeta <- numeric(p)
+TrueBeta[trueidx] <- nonzero.value
+
+rho <- 0.6
+x1 <- matrix(rnorm(n*p), n, p)
+X <- sqrt(1-rho)*x1 + sqrt(rho)*rnorm(n)
+y <- 0.5 + X \%*\% TrueBeta + rnorm(n)
+res<-bits(X,y, pp=TRUE)
+res$model.pp # the vector of screened model
+res$postprobs # the log (unnormalized) posterior probabilities corresponding to the model.pp.
+}
 \references{
 Wang, R., Dutta, S., Roy, V.(2021) Bayesian iterative screening in ultra-high dimensional 
 settings https://arxiv.org/abs/2107.10175
