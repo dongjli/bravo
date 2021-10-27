@@ -24,7 +24,7 @@ If true, the posterior probability stopping rule is used.}
 }
 \value{
 A list with components
-\item{model.pp}{An integer vector of screened model under posterior probability stopping rule.}
+\item{model.pp}{An integer vector of the screened model.}
 \item{postprobs}{The sequence of posterior probabilities until the last included variable.}
  \item{lam}{The value of lam, the slab precision parameter.}
  \item{w}{The value of w, the prior inclusion probability.}
