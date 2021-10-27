@@ -42,7 +42,7 @@ bits <- function(X,y,lam=1, w=NULL, pp = FALSE,max.var = nrow(X))
 
   xbar = colMeans(X)
 
-  if(class(X) == "dgCMatrix") {
+  if(class(X)[1] == "dgCMatrix") {
     D = 1/sqrt(colMSD_dgc(X,xbar))
   }  else   {
     D = apply(X,2,sd)
