@@ -26,14 +26,9 @@ If true, the posterior probability stopping rule is used.}
 A list with components
 \item{model.pp}{An integer vector of screened model under posterior probability stopping rule.
  This will be null if only "eBIC" stopping criterion was used.}
-\item{mdoel.ebic}{An integer vector of screened model under eBIC criterion. This will be NULL if
- only "PP" stopping criterion was used.}
-\item{postprobs}{The sequence of posterior probabilities until the last included variable.
- This will be null if only "eBIC" stopping criterion was used. Here the last included variable
- is the last one included by either "PP" or "eBIC" if criteria="both" was selected}
-\item{ebics}{The sequence of eBIC values until the last included variable.
- This will be null if only "PP" stopping criterion was used.  Here the last included variable
- is the last one included by either "PP" or "eBIC" if criteria="both" was selected}
+\item{postprobs}{The sequence of posterior probabilities until the last included variable.}
+ \item{lam}{The value of lam, the slab precision parameter.}
+ \item{w}{The value of w, the prior inclusion probability.}
 }
 \description{
 Perform Bayesian iterated screening in Gaussian regression models
