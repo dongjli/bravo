@@ -4,7 +4,7 @@
 \alias{bits}
 \title{Bayesian Iterated Screening (ultra-high, high or low dimensional).}
 \usage{
-bits(X, y, lam = 1, w = NULL, pp = FALSE, max.var = nrow(X))
+bits(X, y, lam = 1, w = 0.5, pp = FALSE, max.var = nrow(X))
 }
 \arguments{
 \item{X}{An \eqn{n\times p} matrix. Sparse matrices are supported and every
@@ -17,7 +17,7 @@ No need to center or scale.}
 
 \item{w}{The prior inclusion probability of each variable. Default: \code{1/2}.}
 
-\item{pp}{Booliean: If \code{FALSE} (default) the algorithm stops after including \code{max.var} many variables.
+\item{pp}{Boolean: If \code{FALSE} (default) the algorithm stops after including \code{max.var} many variables.
 If true, the posterior probability stopping rule is used.}
 
 \item{max.var}{The maximum number of variables to be included.}
@@ -26,18 +26,15 @@ If true, the posterior probability stopping rule is used.}
 A list with components
 \item{model.pp}{An integer vector of the screened model.}
 \item{postprobs}{The sequence of posterior probabilities until the last included variable.}
- \item{lam}{The value of lam, the slab precision parameter.}
- \item{w}{The value of w, the prior inclusion probability.}
+\item{lam}{The value of lam, the slab precision parameter.}
+\item{w}{The value of w, the prior inclusion probability.}
 }
 \description{
 Perform Bayesian iterated screening in Gaussian regression models
 }
 \examples{
-n=50; p=100; nonzero = 3
-trueidx <- 1:3
-nonzero.value <- 5
-TrueBeta <- numeric(p)
-TrueBeta[trueidx] <- nonzero.value
+n=50; p=100;
+TrueBeta <- c(rep(5,3),rep(0,p-3))
 
 rho <- 0.6
 x1 <- matrix(rnorm(n*p), n, p)
@@ -48,6 +45,6 @@ res$model.pp # the vector of screened model
 res$postprobs # the log (unnormalized) posterior probabilities corresponding to the model.pp.
 }
 \references{
-Wang, R., Dutta, S., Roy, V.(2021) Bayesian iterative screening in ultra-high dimensional 
-settings https://arxiv.org/abs/2107.10175
+Wang, R., Dutta, S., Roy, V. (2021) Bayesian iterative screening in ultra-high dimensional 
+settings. https://arxiv.org/abs/2107.10175
 }

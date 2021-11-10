@@ -7,25 +7,30 @@
 #' @param y  The response vector of length \code{n}.
 #' @param lam The slab precision parameter. Default: \code{1}.
 #' @param w The prior inclusion probability of each variable. Default: \code{1/2}.
-#' @param pp Booliean: If \code{FALSE} (default) the algorithm stops after including \code{max.var} many variables.
+#' @param pp Boolean: If \code{FALSE} (default) the algorithm stops after including \code{max.var} many variables.
 #' If true, the posterior probability stopping rule is used.
 #' @param max.var The maximum number of variables to be included.
 #' @return A list with components
-#' \item{model.pp}{An integer vector of screened model under posterior probability stopping rule.
-#'  This will be null if only "eBIC" stopping criterion was used.}
-#' \item{mdoel.ebic}{An integer vector of screened model under eBIC criterion. This will be NULL if
-#'  only "PP" stopping criterion was used.}
-#' \item{postprobs}{The sequence of posterior probabilities until the last included variable.
-#'  This will be null if only "eBIC" stopping criterion was used. Here the last included variable
-#'  is the last one included by either "PP" or "eBIC" if criteria="both" was selected}
-#' \item{ebics}{The sequence of eBIC values until the last included variable.
-#'  This will be null if only "PP" stopping criterion was used.  Here the last included variable
-#'  is the last one included by either "PP" or "eBIC" if criteria="both" was selected}
-#' @references Wang, R., Dutta, S., Roy, V.(2021) Bayesian iterative screening in ultra-high dimensional 
-#' settings https://arxiv.org/abs/2107.10175
+#' \item{model.pp}{An integer vector of the screened model.}
+#' \item{postprobs}{The sequence of posterior probabilities until the last included variable.}
+#' \item{lam}{The value of lam, the slab precision parameter.}
+#' \item{w}{The value of w, the prior inclusion probability.}
+#' @references Wang, R., Dutta, S., Roy, V. (2021) Bayesian iterative screening in ultra-high dimensional 
+#' settings. https://arxiv.org/abs/2107.10175
+#' @examples
+#' n=50; p=100;
+#' TrueBeta <- c(rep(5,3),rep(0,p-3))
+#' 
+#' rho <- 0.6
+#' x1 <- matrix(rnorm(n*p), n, p)
+#' X <- sqrt(1-rho)*x1 + sqrt(rho)*rnorm(n)
+#' y <- 0.5 + X %*% TrueBeta + rnorm(n)
+#' res<-bits(X,y, pp=TRUE)
+#' res$model.pp # the vector of screened model
+#' res$postprobs # the log (unnormalized) posterior probabilities corresponding to the model.pp.
 #' @export
 
-bits <- function(X,y,lam=1, w=NULL, pp = FALSE,max.var = nrow(X))
+bits <- function(X,y,lam=1, w=0.5, pp = FALSE,max.var = nrow(X))
 {
   p = ncol(X)
   n = nrow(X)
