@@ -75,7 +75,6 @@ bits <- function(X,y,lam=1, w=0.5, pp = FALSE,max.var = nrow(X))
 
   postprob[1] = -0.5*(n-1)*log(yty) # The posterior probability of the null model
   cat("\n Including: ")
-  # cat(postprob[1],", ")
 
   # First variable
   b0 = sqrt(xtx + lam)
@@ -92,7 +91,7 @@ bits <- function(X,y,lam=1, w=0.5, pp = FALSE,max.var = nrow(X))
     cat(" Done.\n")
     return(list(model.pp = NULL, postprobs=postprob[1],lam=lam))
   }
-  # cat(" ,",logp[j],"\n")
+
   # Need to do the second variable by hand
   if(max.var >= 2)
   {
@@ -121,7 +120,6 @@ bits <- function(X,y,lam=1, w=0.5, pp = FALSE,max.var = nrow(X))
       return(list(model.pp = model[1:2], postprobs=postprob[1],lam=lam))
     }
 
-    # cat(" ,",logp[j],"\n")
   }
 
 
@@ -170,11 +168,9 @@ bits <- function(X,y,lam=1, w=0.5, pp = FALSE,max.var = nrow(X))
 
       logp = 0.5*ii*log(lam) - logdetR - log(w2) - 0.5*{n-1}*log(RSS) + ii*logw
 
-      # print(anyNA(logp))
       j = which.max(logp)
 
       cat(", ",j)
-      # cat(" ,",logp[j],"\n")
       postprob[ii+1] <- logp[j]
       model[ii] = j
       if(postprob[ii+1]<postprob[ii] && pp){
@@ -187,7 +183,6 @@ bits <- function(X,y,lam=1, w=0.5, pp = FALSE,max.var = nrow(X))
       {
         R[1:{ii-2},ii-1] = a1;
         R[ii-1,ii-1] = b1;
-        # print(R[1:{ii-1},1:{ii-1}])
       }
 
     }
@@ -197,69 +192,3 @@ bits <- function(X,y,lam=1, w=0.5, pp = FALSE,max.var = nrow(X))
   return(list(model.pp = model, postprobs=postprob,lam=lam,w=w))
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# bits <- function(X,y,lam=nrow(X)/ncol(X)^2,w = sqrt(nrow(X))/ncol(X),criteria="PP")
-# {
-#   p = ncol(X)
-#   n = nrow(X)
-#   ys = scale(y)
-#
-#   xbar = colMeans(X)
-#
-#   stopifnot(class(X) %in% c("dgCMatrix","matrix"))
-#
-#   if(class(X) == "dgCMatrix") {
-#     D = 1/sqrt(colMSD_dgc(X,xbar))
-#   }  else   {
-#     D = apply(X,2,sd)
-#     D = 1/D
-#   }
-#   Xty = D*as.numeric(crossprod(X,ys))
-#
-#
-#   max.var = n; # Intially allocate for maximum of n variables.
-#
-#   model = integer(0L)
-#   postprob = numeric(max.var+1)
-#   R0 = NULL
-#   v0 = NULL
-#
-#   postprob[1] = -0.5*(n-1)*log(n) # The posterior probability of the null model
-#   cat("\n Including: ")
-#   for(ii in 1:n)
-#   {
-#     this <- addvar(model = model,x = X, ys = ys, xty = Xty, lam = lam, w = w,
-#                    R0 = R0, v0 = v0,D = D,xbar = xbar)
-#     j = this$which.max
-#     if(this$logp[j] < postprob[ii])      break;
-#     cat(j,", ",sep = "")
-#     postprob[ii+1] <- this$logp[j]
-#     model = c(model,j)
-#     R0 = this$R
-#     v0 = this$v
-#   }
-#   cat(" Done.\n")
-#
-#   return(list(model.pp = model, postprobs=postprob[1:ii]))
-# }
