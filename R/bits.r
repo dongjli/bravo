@@ -30,7 +30,7 @@
 #' res$postprobs # the log (unnormalized) posterior probabilities corresponding to the model.pp.
 #' @export
 
-bits <- function(X,y,lam=1, w=0.5, pp = FALSE,max.var = nrow(X))
+bits <- function(X,y,lam=1, w=0.5, pp = FALSE,max.var = nrow(X), verbose = TRUE)
 {
   p = ncol(X)
   n = nrow(X)
@@ -74,7 +74,7 @@ bits <- function(X,y,lam=1, w=0.5, pp = FALSE,max.var = nrow(X))
 
 
   postprob[1] = -0.5*(n-1)*log(yty) # The posterior probability of the null model
-  cat("\n Including: ")
+  if(verbose) cat("\n Including: ")
 
   # First variable
   b0 = sqrt(xtx + lam)
@@ -84,11 +84,11 @@ bits <- function(X,y,lam=1, w=0.5, pp = FALSE,max.var = nrow(X))
 
 
   j = which.max(logp)
-  cat(j)
+  if(verbose) cat(j)
   model[1] = j;
   postprob[2] = logp[j]
   if(postprob[2]<postprob[1] && pp){
-    cat(" Done.\n")
+    if(verbose) cat(" Done.\n")
     return(list(model.pp = NULL, postprobs=postprob[1],lam=lam))
   }
 
@@ -112,11 +112,11 @@ bits <- function(X,y,lam=1, w=0.5, pp = FALSE,max.var = nrow(X))
     logp = 0.5*2*log(lam) - logdetR - log(w1) - 0.5*{n-1}*log(RSS) + 2*logw
 
     j = which.max(logp)
-    cat(", ",j)
+    if(verbose) cat(", ",j)
     model[2] = j
     postprob[3] = logp[j]
     if(postprob[3]<postprob[2] && pp){
-      cat(" Done.\n")
+      if(verbose) cat(" Done.\n")
       return(list(model.pp = model[1:2], postprobs=postprob[1],lam=lam))
     }
 
@@ -170,11 +170,11 @@ bits <- function(X,y,lam=1, w=0.5, pp = FALSE,max.var = nrow(X))
 
       j = which.max(logp)
 
-      cat(", ",j)
+      if(verbose) cat(", ",j)
       postprob[ii+1] <- logp[j]
       model[ii] = j
       if(postprob[ii+1]<postprob[ii] && pp){
-        cat(" Done.\n")
+        if(verbose) cat(" Done.\n")
         return(list(model.pp = model[1:(ii-1)], postprobs=postprob[1:ii],lam=lam,w=w))
       }
 
@@ -187,8 +187,8 @@ bits <- function(X,y,lam=1, w=0.5, pp = FALSE,max.var = nrow(X))
 
     }
   }
-  cat(" Done.\n")
+  if(verbose) cat(" Done.\n")
 
-  return(list(model.pp = model, postprobs=postprob,lam=lam,w=w))
+  return(list(model.pp = model[1:ii], postprobs=postprob,lam=lam,w=w))
 }
 
