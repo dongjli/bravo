@@ -10,6 +10,7 @@
 #' @param pp Boolean: If \code{FALSE} (default) the algorithm stops after including \code{max.var} many variables.
 #' If true, the posterior probability stopping rule is used.
 #' @param max.var The maximum number of variables to be included.
+#' @param verbose If \code{TRUE} (default) will show the variable index included in each iteration.
 #' @return A list with components
 #' \item{model.pp}{An integer vector of the screened model.}
 #' \item{postprobs}{The sequence of posterior probabilities until the last included variable.}
@@ -80,7 +81,7 @@ bits <- function(X,y,lam=1, w=0.5, pp = FALSE,max.var = nrow(X), verbose = TRUE)
   b0 = sqrt(xtx + lam)
   logdetR = log(b0)
 
-  logp <- 0.5*log(lam)-logdetR - 0.5*(n-1)*log(yty - (xty/b0)^2) + logw
+  logp <- as.numeric(0.5*log(lam)-logdetR - 0.5*(n-1)*log(yty - (xty/b0)^2) + logw)
 
 
   j = which.max(logp)
@@ -109,7 +110,7 @@ bits <- function(X,y,lam=1, w=0.5, pp = FALSE,max.var = nrow(X), verbose = TRUE)
     RSS = yty - sumv2 - u^2
     RSS[j] = Inf
 
-    logp = 0.5*2*log(lam) - logdetR - log(w1) - 0.5*{n-1}*log(RSS) + 2*logw
+    logp = as.numeric(0.5*2*log(lam) - logdetR - log(w1) - 0.5*{n-1}*log(RSS) + 2*logw)
 
     j = which.max(logp)
     if(verbose) cat(", ",j)
@@ -148,7 +149,7 @@ bits <- function(X,y,lam=1, w=0.5, pp = FALSE,max.var = nrow(X), verbose = TRUE)
 
 
       temp1 = D1*backsolve(R,a1,transpose = FALSE,k = ii-2)
-      temp2 = xjc - X1 %*% temp1;
+      temp2 = as.numeric(xjc - X1 %*% temp1);
       temp2 = temp2 - mean(temp2)
 
       eta = D*crossprod(X,temp2)
@@ -166,7 +167,7 @@ bits <- function(X,y,lam=1, w=0.5, pp = FALSE,max.var = nrow(X), verbose = TRUE)
       RSS = yty - sumv2 - u^2
       RSS[model[1:{ii-1}]] = Inf
 
-      logp = 0.5*ii*log(lam) - logdetR - log(w2) - 0.5*{n-1}*log(RSS) + ii*logw
+      logp = as.numeric(0.5*ii*log(lam) - logdetR - log(w2) - 0.5*{n-1}*log(RSS) + ii*logw)
 
       j = which.max(logp)
 

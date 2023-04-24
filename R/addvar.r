@@ -65,7 +65,7 @@ addvar <- function (model, x, ys, xty, lam, w, R0 = NULL, v0 = NULL, D,xbar,BugS
   sj = S[,j]
   s0j = s0[j]
   R1 = rbind(cbind(R0,sj),c(rep(0,p0),s0j))
-  R1 = as(R1,"dtCMatrix")
+  R1 = as.matrix(R1)   ##as(R1,"dtCMatrix") depricated. simply keeping dense matrix format
   v1 = c(v0,u[j])
 
   if(BugShikari) {

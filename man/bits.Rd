@@ -4,7 +4,7 @@
 \alias{bits}
 \title{Bayesian Iterated Screening (ultra-high, high or low dimensional).}
 \usage{
-bits(X, y, lam = 1, w = 0.5, pp = FALSE, max.var = nrow(X))
+bits(X, y, lam = 1, w = 0.5, pp = FALSE, max.var = nrow(X), verbose = TRUE)
 }
 \arguments{
 \item{X}{An \eqn{n\times p} matrix. Sparse matrices are supported and every
@@ -21,6 +21,8 @@ No need to center or scale.}
 If true, the posterior probability stopping rule is used.}
 
 \item{max.var}{The maximum number of variables to be included.}
+
+\item{verbose}{If \code{TRUE} (default) will show the variable index included in each iteration.}
 }
 \value{
 A list with components
