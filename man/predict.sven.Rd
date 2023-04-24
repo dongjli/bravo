@@ -78,5 +78,5 @@ Dimensional Settings http://arxiv.org/abs/2006.07561
 }
 \author{
 Dongjin Li and Somak Dutta\cr Maintainer:
-Dongjin Li <dongjl@iastate.edu>
+Dongjin Li <liyangxiaobei@gmail.com>
 }
