@@ -201,7 +201,7 @@ sven <- function(X, y, w = sqrt(nrow(X))/ncol(X), lam = nrow(X)/ncol(X)^2, Ntemp
   mtop.idx <- apply(model.top, 2, which)
   model.union <- Reduce(union, mtop.idx)
   Xm <- sparseMatrix(i = integer(0), j = integer(0), dims = c(n, ncovar))
-  Xm <- as(Xm, "dgCMatrix")
+  Xm <- as(Xm, "dMatrix")
   Xm[, model.union] <- X[, model.union, drop=F]
 
   result$model.map <- model.MAP

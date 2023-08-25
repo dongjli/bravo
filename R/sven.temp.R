@@ -16,7 +16,10 @@ sven.temp <- function(xmat, ys, xty, lam, w, topKeep, D, xbar, temp, stepsize, l
   rc.k.idx <- order(res1, decreasing = T)[1:k]
   rc.k <- res1[rc.k.idx]
   RSS.k <- res1.RSS[rc.k.idx]
-  s <- sample.int(k, 1, prob = exp((rc.k-max(rc.k, na.rm = T))/(temp*stepsize)))
+  probs = exp(rc.k-max(rc.k, na.rm = T)) / (temp*stepsize)
+  probs[is.na(probs)] = 0
+  s <- sample.int(k, 1, prob = probs)
+  # s <- sample.int(k, 1, prob = exp((rc.k-max(rc.k, na.rm = T))/(temp*stepsize)))
 
   logp.curr <- rc.k[s]
   RSS.curr <- RSS.k[s]
@@ -57,7 +60,10 @@ sven.temp <- function(xmat, ys, xty, lam, w, topKeep, D, xbar, temp, stepsize, l
     rc.k.idx <- order(rc, decreasing = T)[1:k]
     rc.k <- rc[rc.k.idx]
     RSS.k <- rc.RSS[rc.k.idx]
-    s <- sample.int(k, 1, prob = exp((rc.k-max(rc.k, na.rm = T))/(temp*stepsize)))
+    probs = exp(rc.k-max(rc.k, na.rm = T)) / (temp*stepsize)
+    probs[is.na(probs)] = 0
+    s <- sample.int(k, 1, prob = probs)
+    # s <- sample.int(k, 1, prob = exp((rc.k-max(rc.k, na.rm = T))/(temp*stepsize)))
     logp.curr <- rc.k[s]
     RSS.curr <- RSS.k[s]
     idx.pick = rc.k.idx[s]

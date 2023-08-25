@@ -18,7 +18,9 @@ sven.notemp <- function(xmat, ys, xty, lam, w, topKeep, D, xbar, n, ncovar, Mite
   rc.k.idx <- order(res1, decreasing = T)[1:k]
   rc.k <- res1[rc.k.idx]
   RSS.k <- res1.RSS[rc.k.idx]
-  s <- sample.int(k, 1, prob = exp(rc.k-max(rc.k, na.rm = T)))
+  probs = exp(rc.k-max(rc.k, na.rm = T))
+  probs[is.na(probs)] = 0
+  s <- sample.int(k, 1, prob = probs)
   logp.curr <- rc.k[s]
   RSS.curr <- RSS.k[s]
   rc.idx <- rc.k.idx[s]
@@ -59,7 +61,13 @@ sven.notemp <- function(xmat, ys, xty, lam, w, topKeep, D, xbar, n, ncovar, Mite
     rc.k.idx <- order(rc, decreasing = T)[1:k]
     rc.k <- rc[rc.k.idx]
     RSS.k <- rc.RSS[rc.k.idx]
-    s <- sample.int(k, 1, prob = exp(rc.k-max(rc.k, na.rm = T)))
+    
+    probs = exp(rc.k-max(rc.k, na.rm = T))
+    probs[is.na(probs)] = 0
+    s <- sample.int(k, 1, prob = probs)
+    # s <- sample.int(k, 1, prob = exp(rc.k-max(rc.k, na.rm = T)))
+    
+    
     logp.curr <- rc.k[s]
     RSS.curr <- RSS.k[s]
     idx.pick = rc.k.idx[s]
