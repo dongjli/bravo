@@ -106,6 +106,7 @@ sven.notemp <- function(xmat, ys, xty, lam, w, topKeep, D, xbar, n, ncovar, Mite
       curridx[start:end] <- rc.idx
       start <- start + currlength
     }
+    print(c(logp.curr,rc.idx))
   }
 
   return(list(bestlogp=logp.best, bestidx=r.idx.best, currlogp=currlogp,
