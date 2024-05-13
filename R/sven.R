@@ -13,12 +13,16 @@
 #' @param X The \eqn{n\times p} covariate matrix or list of two matrices without intercept. 
 #' The following classes are supported: \code{matrix} and \code{dgCMatrix}. Every care is taken not to make copies of these (typically)
 #' giant matrices. No need to center or scale these matrices manually. Scaling is performed implicitly and 
-#' regression coefficient are returned on the original scale.
+#' regression coefficient are returned on the original scale. Typically, in a combined GWAS-TWAS type 
+#' analysis, \code{X[[1]]} should be a sparse matrix and \code{X[[2]]} should be a dense matrix.
 #' @param y The response vector of length \eqn{n}. No need to center or scale.
-#' @param w The prior inclusion probability of each variable. Default: \eqn{sqrt(n)/p}.
-#' @param lam The slab precision parameter. Default: \eqn{n/p^2} for 
-#' as suggested by the theory of Li et al. (2023).
-#' @param Ntemp The number of temperatures. Default: 3.
+#' @param w The prior inclusion probability of each variable. Default: NULL, whence it is set as
+#' \eqn{\sqrt{n}/p} if \eqn{X} is a matrix. Or \eqn{(\sqrt{n}/p_1,\sqrt{n}/p_2)} if $X$ is a list of 
+#' two matrices with \eqn{p_1} and \eqn{p_2} columns.
+#' @param lam The slab precision parameter. Default: NULL, whence it is set as \eqn{n/p^2} for 
+#' as suggested by the theory of Li et al. (2023). Similarly, it's a vector of length two with values
+#' \eqn{\sqrt{n}/P_1^2} and \eqn{\sqrt{n}/p_2^2} when \code{X} is a list.
+#' @param Ntemp The number of temperatures. Default: 10.
 #' @param Tmax The maximum temperature. Default: \eqn{\log\log p+\log p}.
 #' @param Miter The number of iterations per temperature. Default: \code{50}.
 #' @param wam.threshold The threshold probability to select the covariates for WAM.
@@ -26,7 +30,7 @@
 #' probability is greater than the threshold. Default: 0.5.
 #' @param log.eps The tolerance to choose the number of top models. See detail. Default: -16.
 #' @param L The minimum number of neighboring models screened. Default: 20.
-#' @param verbose If \code{TRUE}, the function prints the current temperature SVEN is at; the default is TRUE. 
+#' @param verbose If \code{FALSE}, the function prints the current temperature SVEN is at; the default is TRUE. 
 #'
 #' @details
 #' SVEN is developed based on a hierarchical Gaussian linear model with priors placed 
@@ -66,6 +70,13 @@
 #' are stored in an \eqn{p \times K} sparse matrix, along with their corresponding log (unnormalized) 
 #' posterior probabilities. 
 #' 
+#' When \code{X} is a list with two matrices, say, \code{W} and \code{Z}, the above method is extended 
+#' to \code{ncol(W)+ncol(Z)} dimensional regression. However, the hyperparameters \code{lam} and \code{w}
+#' are chosen separately for the two matrices, the default values being  \code{nrow(W)/ncol(W)^2}
+#' and \code{nrow(Z)/ncol(Z)^2} for \code{lam} and \code{sqrt(nrow(W))/ncol(W)} and
+#'  \code{sqrt(nrow(Z))/ncol(Z)} for \code{w}.
+#'  
+#'  The marginal inclusion probabities can be extracted by using the function \code{mip}.
 #' 
 #' @return A list with components
 #' \item{model.map}{A vector of indices corresponding to the selected variables
@@ -85,32 +96,33 @@
 #'
 #' @author Dongjin Li, Debarshi Chakraborty, and Somak Dutta\cr Maintainer:
 #' Dongjin Li <liyangxiaobei@@gmail.com>
-#' @references Li, D., Dutta, S., Roy, V.(2023) Model Based Screening Embedded Bayesian 
-#' Variable Selection for Ultra-high Dimensional Settings. Journal of Computational and Graphical Statistics
-#' @examples
-#' n=50; p=100; nonzero = 3
-#' trueidx <- 1:3
-#' nonzero.value <- 5
-#' TrueBeta <- numeric(p)
-#' TrueBeta[trueidx] <- nonzero.value
 #' 
-#' rho <- 0.6
-#' x1 <- matrix(rnorm(n*p), n, p)
-#' X <- sqrt(1-rho)*x1 + sqrt(rho)*rnorm(n)
-#' y <- 0.5 + X %*% TrueBeta + rnorm(n)
+#' @seealso [mip.sven()] for marginal inclusion probabilities, [predict.sven()](via [predict()]) for prediction for .
+#' 
+#' 
+#' @references Li, D., Dutta, S., and Roy, V. (2023). Model based screening embedded Bayesian variable 
+#' selection for ultra-high dimensional settings. Journal of Computational and Graphical Statistics, 
+#' 32(1), 61-73.
+#' @examples
+#' \donttest{
+#' n <- 50; p <- 100; nonzero <- 3
+#' trueidx <- 1:3
+#' truebeta <- c(4,5,6)
+#' X <- matrix(rnorm(n*p), n, p) # n x p covariate matrix
+#' y <- 0.5 + X[,trueidx] %*% truebeta + rnorm(n)
 #' res <- sven(X=X, y=y)
 #' res$model.map # the MAP model
-#' res$model.wam # the WAM
-#' res$mip.map # the marginal inclusion probabilities of the variables in the MAP model
-#' res$mip.wam # the marginal inclusion probabilities of the variables in the WAM
-#' res$pprob.top # the log (unnormalized) posterior probabilities corresponding to the top models.
 #' 
-#' res$beta.map # the ridge estimator of regression coefficients in the MAP model 
-#' res$beta.wam # the ridge estimator of regression coefficients in the WAM
+#' 
+#' Z <- matrix(rnorm(n*p), n, p) # another covariate matrix
+#' y2 = 0.5 + X[,trueidx] %*% truebeta  + Z[,1:2] %*% c(-2,-2) + rnorm(n)
+#' res2 <- sven(X=list(X,Z), y=y2)
+#' }
+#' 
 #' @export
-sven <- function(X, y, w = NULL, lam = NULL, Ntemp = 3,
+sven <- function(X, y, w = NULL, lam = NULL, Ntemp = 10,
                  Tmax = NULL, Miter = 50, wam.threshold = 0.5, 
-                 log.eps = -16, L = 20, verbose = TRUE) {
+                 log.eps = -16, L = 20, verbose = FALSE) {
   if(is.list(X))
   {
     if(length(X) != 2)
@@ -141,7 +153,6 @@ sven <- function(X, y, w = NULL, lam = NULL, Ntemp = 3,
       result = sven.xz(x1 = X1,x2 = X2,y = y,w1 = w1,w2 = w2,lam1 = lam1,lam2 = lam2,
                         Ntemp = Ntemp, Tmax = Tmax, Miter = Miter, wam.threshold = wam.threshold,
                         log.eps = log.eps, L = L, verbose = verbose)
-      return(result)
   } else   {
     stopifnot(class(X)[1] %in% c("dgCMatrix","matrix"))
     if(is.null(w)) 
@@ -158,6 +169,14 @@ sven <- function(X, y, w = NULL, lam = NULL, Ntemp = 3,
                     log.eps = log.eps, L = L, verbose = verbose)
   }
   
+  result$stats$islist = is.list(X)
+  if(is.list(X))
+  {
+    result$stats$colnamesX = colnames(X[[1]])
+    result$stats$colnamesZ = colnames(X[[2]])
+  } else   {
+    result$stats$colnamesX = colnames(X)
+  }
   return(result)
 }
 

@@ -5,12 +5,15 @@ importFrom(Rcpp, evalCpp)
 
 importFrom("stats", "sd")
 
-importFrom("Matrix","Diagonal","sparseMatrix","tcrossprod","crossprod","diag","colMeans","colSums", "t","rowMeans", "rowSums", "solve")
+importFrom("Matrix","Diagonal","sparseMatrix","tcrossprod","crossprod","diag","colMeans",
+           "colSums", "t","rowMeans", "rowSums", "solve")
 importClassesFrom(Matrix, dgeMatrix, dgCMatrix, dsCMatrix,dtCMatrix)
 importFrom("methods", "as")
 importFrom("stats", "qnorm", "quantile", "rgamma", "rnorm", "var")
 
 export(bits)
 export(sven)
+export(mip.sven)
 export(predict.sven)
 S3method(predict,sven)
+
