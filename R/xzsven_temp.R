@@ -72,7 +72,7 @@ xzsven.temp <- function(x1,x2,ys,x1ty,x2ty,lam1,lam2,w1,w2,topKeep,D1,D2,x1bar,x
     } else {
       idx.temp <- idx.pick - ncovar
       idx.add <- idx.temp %% ncovar
-      if(idx.add == 0) idx.add = ncovar
+      # if(idx.add == 0) idx.add = ncovar
       idx.del <- idx.temp %/% ncovar
       if(idx.add > 0) {
         if (idx.del == 0) {
