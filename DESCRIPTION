@@ -1,7 +1,7 @@
 Package: bravo
 Type: Package
 Title: Bayesian Screening and Variable Selection
-Version: 3.2.1
+Version: 3.2.2
 Author: Dongjin Li [aut, cre], Debarshi Chakraborty[aut], Somak Dutta [aut], Vivekananda Roy [ctb]
 Maintainer: Dongjin Li <liyangxiaobei@gmail.com>
 Description: Performs Bayesian variable screening and selection for ultra-high dimensional linear regression models.
