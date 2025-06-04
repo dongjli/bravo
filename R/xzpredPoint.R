@@ -8,7 +8,7 @@ predPoint.xz <- function(object, x1new, x2new, model) {
   }
   intercept <- beta[1]
   coeffs <- beta[-1]
-  beta1 <- coeffs[1:ncol(x1)] ; beta2 <- coeffs[(ncol(x1)+1):(ncol(x1)+ncol(x2))]
+  beta1 <- coeffs[1:ncol(x1new)] ; beta2 <- coeffs[(ncol(x1new)+1):(ncol(x1new)+ncol(x2new))]
   y.pred <- beta[1] + x1new %*% beta1 + x2new %*% beta2
   return(y.pred)
 }
