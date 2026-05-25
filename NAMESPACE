@@ -1,7 +1,7 @@
 useDynLib(bravo, .registration=TRUE)
 
 importFrom(Rcpp, evalCpp)
-#Do not edit by hand
+#do not edit by hand
 
 importFrom("stats", "sd")
 
