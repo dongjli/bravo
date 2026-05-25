@@ -1,19 +1,37 @@
 useDynLib(bravo, .registration=TRUE)
 
 importFrom(Rcpp, evalCpp)
-
+#Do not edit by hand
 
 importFrom("stats", "sd")
 
 importFrom("Matrix","Diagonal","sparseMatrix","tcrossprod","crossprod","diag","colMeans",
-           "colSums", "t","rowMeans", "rowSums", "solve")
+           "colSums", "t","rowMeans", "rowSums", "solve","bdiag")
 importClassesFrom(Matrix, dgeMatrix, dgCMatrix, dsCMatrix,dtCMatrix)
 importFrom("methods", "as")
-importFrom("stats", "qnorm", "quantile", "rgamma", "rnorm", "var")
+importFrom("stats", "qnorm", "quantile", "rgamma", "rnorm", "var","cor","runif")
+
+importFrom("shiny", "runApp")
+importFrom("doParallel","registerDoParallel")
+importFrom("parallel","makeCluster")
+importFrom("parallel","stopCluster")
+importFrom("foreach","foreach")
+importFrom("foreach","%dopar%")
+importFrom("dplyr","%>%","filter","mutate")
+
+importFrom("bslib","page_fillable","bs_theme","nav_panel","navset_tab","nav_select","layout_columns")
+importFrom("shinyjs","useShinyjs","hide","show","disable","enable","html","hidden")
+importFrom("memuse","Sys.meminfo")
+
+importFrom("utils","setTxtProgressBar","txtProgressBar","write.csv")
+
+
+
 
 export(bits)
 export(sven)
 export(mip.sven)
 export(predict.sven)
 S3method(predict,sven)
-
+export(svenetics)
+export(dense_to_sparse_converter)

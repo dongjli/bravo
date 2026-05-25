@@ -1,14 +1,19 @@
 Package: bravo
 Type: Package
 Title: Bayesian Screening and Variable Selection
-Version: 3.2.2
-Author: Dongjin Li [aut, cre], Debarshi Chakraborty[aut], Somak Dutta [aut], Vivekananda Roy [ctb]
+Version: 4.0.0
+Author: Dongjin Li [aut, cre], Debarshi Chakraborty [aut], Somak Dutta [aut], Vivekananda Roy [ctb]
+Authors@R: c(person("Dongjin", "Li", email = "liyangxiaobei@gmail.com", role = c("aut", "cre")),
+    person("Debarshi", "Chakraborty", role = "aut"),
+    person("Somak", "Dutta", role = "aut"),
+    person("Vivekananda", "Roy", role = "ctb"))
 Maintainer: Dongjin Li <liyangxiaobei@gmail.com>
-Description: Performs Bayesian variable screening and selection for ultra-high dimensional linear regression models.
+Description: Performs Bayesian variable screening and selection for ultra-high dimensional linear regression models.Also contains an user friendly web application to perform multi trait GWAS.
 License: GPL-3
 Encoding: UTF-8
 Depends: R (>= 3.0.2), methods
-Imports: Rcpp (>= 1.0.2), Matrix (>= 1.2-17)
+Imports: Rcpp (>= 1.0.2), Matrix (>= 1.2-17),dplyr,parallel,doParallel,foreach,shiny,bslib,shinyjs,memuse
 LinkingTo: Rcpp
 NeedsCompilation: yes
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.3
+Packaged: 2026-05-25 01:43:03 UTC; debchak
