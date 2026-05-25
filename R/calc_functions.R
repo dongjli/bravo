@@ -449,7 +449,7 @@ dense2sparse <- function(file.name, num.genotypes, separator,progress = TRUE) {
       break
     }
     line_num <- line_num + 1
-    # cat("Processing line: ",line_num,"\n")
+    # cat("Processing line:  ",line_num,"\n")
     fields <- strsplit(line, split = separator)[[1]]
     row_names[line_num] <- fields[1]
     
