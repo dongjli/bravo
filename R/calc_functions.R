@@ -259,6 +259,8 @@ basic.sven.model <- function(x, y, params, seed = 2441139){
 #' @param n.cores Number of cores (default: detectCores() - 1).
 #' @param hitsize One of "all", "small", "medium", "large" (default "all").
 #' @param MAF_threshold MAF cutoff (default 0.05).
+#' @return A list containing the original SNP matrix, cleaned SNP matrix, optimal parameters, MAF threshold, expected hit size, and number of cores used. The list is assigned class "svenetics_trained" for use in downstream functions.
+#' @export
 
 parameter_selection <- function(X, R2 = 0.5, betamax = 1, n.cores = max(1, parallel::detectCores() - 1), hitsize = "all", MAF_threshold = 0.05){
   bigX <- X
@@ -355,18 +357,16 @@ pipeline_single_trait <- function(svenetics_trained_object, i, hitsize = NULL){
 }
 
 
-#' @title Full Multi-Trait GWAS Pipeline
-#' @description Runs GWAS across all traits in parallel and saves results as CSVs.
-#' @param svenetics_trained_object A trained svenetics object from parameter_selection().
-#' @param traitfile Data frame with sample IDs in column 1 and traits in remaining columns.
-#' @param hitsizes Character vector of hit sizes per trait, or NULL for "medium" across all.
-#' @export
+
+
 #' @title Full Multi-Trait GWAS Pipeline
 #' @description Runs GWAS across all traits and saves results as CSVs.
 #' @param svenetics_trained_object A trained svenetics object from parameter_selection().
 #' @param traitfile Data frame with sample IDs in column 1 and traits in remaining columns.
 #' @param hitsizes Character vector of hit sizes per trait, or NULL for "medium" across all.
 #' @param save_dir Directory path where results will be saved (default "~/SVENETICS_RESULTS").
+#' @return Saves the selected SNPs and their MIPs for each trait as separate CSV files in the specified directory. Also returns a list of data frames with the results for each trait.
+#' @export
 svenetics_pipeline <- function(svenetics_trained_object, traitfile, hitsizes = NULL, save_dir = "~/SVENETICS_RESULTS"){
   obj = svenetics_trained_object
   trait_names <- colnames(traitfile)[-1]
@@ -405,6 +405,8 @@ svenetics_pipeline <- function(svenetics_trained_object, traitfile, hitsizes = N
 #' @title Estimate SVEN Runtime
 #' @description Times a single SVEN run on the given SNP matrix using a random phenotype.
 #' @param X SNP matrix.
+#' @return Time taken to run sven() once.
+#' @export
 
 calc.runtime <- function(X){
   y = rnorm(nrow(X))
@@ -423,7 +425,8 @@ calc.runtime <- function(X){
 #' @param num.genotypes Maximum number of genotypes to read. An upper bound is OK.
 #' @param separator "\\t" or "," etc that separates the entries in a line.
 #' @param progress Whether to show a progress bar (default TRUE).
-
+#' @return A sparse matrix of class dgCMatix.
+#' @export
 
 
 dense2sparse <- function(file.name, num.genotypes, separator,progress = TRUE) {
@@ -449,7 +452,7 @@ dense2sparse <- function(file.name, num.genotypes, separator,progress = TRUE) {
       break
     }
     line_num <- line_num + 1
-    # cat("Processing line:  ",line_num,"\n")
+    # cat("Processing line: ",line_num,"\n")
     fields <- strsplit(line, split = separator)[[1]]
     row_names[line_num] <- fields[1]
     
