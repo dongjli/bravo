@@ -5,7 +5,7 @@ library(shinyjs)
 library(memuse)
 library(dplyr)
 library(foreach)
-library(svenetics)
+
 
 options(shiny.maxRequestSize = 1000 * 1000^2)
 
