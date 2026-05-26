@@ -1,10 +1,10 @@
-library(Matrix)
-library(shiny)
-library(bslib)
-library(shinyjs)
-library(memuse)
-library(dplyr)
-library(foreach)
+library("Matrix")
+library("shiny")
+library("bslib")
+library("shinyjs")
+library("memuse")
+library("dplyr")
+library("foreach")
 
 
 options(shiny.maxRequestSize = 1000 * 1000^2)
@@ -91,7 +91,7 @@ ui <- page_fillable(
                                   "Welcome to SVENETICS !!!"),
                           p("SVENETICS is a Bayesian multi-trait GWAS pipeline built on top of ",
                             tags$b("SVEN"), " (Selection of Variables with Embedded screening using Bayesian methods). ",
-                            "It is designed to identify causal SNPs across multiple quantitative traits in a statistically rigorous and computationally efficient manner. This web app is supposed to be a user-friendly interface to run the SVENETICS pipeline without needing to write any code. Let;s dive into the step by step details on how to use it.",),
+                            "It is designed to identify causal SNPs across multiple quantitative traits in a statistically rigorous and computationally efficient manner. This web app is supposed to be a user-friendly interface to run the SVENETICS pipeline without needing to write any code. Let's dive into the step by step details on how to use it.It is highly recommended to open this tab in a new browser window. Find the OPEN IN BROWSER button on top left.",),
                           tags$h5(style = "color: #e6edf3; font-family: 'Roboto Mono', monospace; font-weight: 700; margin: 20px 0 12px;",
                                   "User guide - step by step "),
                           tags$ol(style = "color: #8b949e; line-height: 2; font-size: 0.88rem;",
@@ -134,7 +134,7 @@ ui <- page_fillable(
                           div(class = "step-title", "Train GWAS Model"),
                           div(class = "step-desc",
                               "Upload your SNP matrix (.rds) to calibrate optimal 
-                               parameters. Please remember that the genotype names of this SNP.rds file should match the genotype names(first column) of the traits.csv file ideally. The names which do not match will be dropped.The trained object will be saved to your working directory."),
+                               parameters. Please remember that the genotype names of this SNP.rds file should match the genotype names(first column) of the traits.csv file ideally. The names which do not match will be dropped.The trained object will be saved to your chosen directory."),
                           div(class = "upload-area",
                               div(class = "upload-label", "SNP Matrix (.rds)"),
                               fileInput("snp_file", label = NULL, accept = ".rds", placeholder = "X_matrix.rds", buttonLabel = "Browse")
@@ -194,7 +194,7 @@ ui <- page_fillable(
                           div(class = "step-title", "Run GWAS Pipeline with optimal hyperparameters"),
                           div(class = "step-desc",
                               "Upload your saved ", tags$code("svenetics_trained"), " object (.rds) and trait file (.csv) to run the full ",
-                              "multi-trait GWAS. Results for each trait will be saved as ", tags$code("{trait}_GWAS_results.csv"), " in your working directory."),
+                              "multi-trait GWAS. Results for each trait will be saved as ", tags$code("{trait}_GWAS_results.csv"), " in your chosen directory."),
                           div(class = "upload-area",
                               div(class = "upload-label", "Trained Object (.rds)"),
                               fileInput("trained_obj_file", label = NULL, accept = ".rds", placeholder = "svenetics_trained.rds", buttonLabel = "Browse"),
@@ -206,6 +206,15 @@ ui <- page_fillable(
                           div(class = "param-section",
                               div(class = "param-title", "ℹ Pipeline Info"),
                               uiOutput("pipeline_info")
+                          ),
+                          div(
+                            tags$label(class = "form-label", "Save Location",
+                                       tags$span(class = "info-icon", "i",
+                                                 tags$span(class = "tooltip-text", "Choose where to save the GWAS results."))),
+                            selectInput("save_location_run", label = NULL,
+                                        choices = c("Downloads" = "downloads", "Desktop" = "desktop", "Working Directory" = "working"),
+                                        selected = "downloads"),
+                            uiOutput("resolved_dir_display_run")
                           ),
                           actionButton("run_btn", "RUN.GWAS", class = "btn-run", icon = icon("play")),
                           div(class = "status-box", uiOutput("run_status"))
@@ -222,7 +231,6 @@ server <- function(input, output, session) {
   snp_matrix     <- reactiveVal(NULL)
   trait_names    <- reactiveVal(NULL)
   max_safe_cores <- reactiveVal(NULL)
-  
   
   resolve_dir <- reactive({
     choice <- input$save_location
@@ -243,15 +251,24 @@ server <- function(input, output, session) {
              paste0("→ ", resolve_dir()))
   })
   
+  resolve_dir_run <- reactive({
+    choice <- input$save_location_run
+    home <- path.expand("~")
+    candidate <- switch(choice,
+                        "downloads" = file.path(home, "Downloads"),
+                        "desktop"   = file.path(home, "Desktop"),
+                        "working"   = getwd()
+    )
+    base <- if(dir.exists(candidate)) candidate else getwd()
+    save_dir <- file.path(base, "SVENETICS_FOLDER")
+    dir.create(save_dir, showWarnings = FALSE, recursive = TRUE)
+    save_dir
+  })
   
-  # create output directory in user's working directory
-  #out_dir <- file.path(getwd(), "SVENETICS_RESULTS")
-  #if(!dir.exists(out_dir)){
-    #dir.create(out_dir)
-  #}
-  #save_dir <- path.expand("~/SVENETICS_ RESULTS")
-  
-
+  output$resolved_dir_display_run <- renderUI({
+    tags$div(style = "font-family:'Roboto Mono',monospace; font-size:0.72rem; color:#484f58; margin-top:5px;",
+             paste0("→ ", resolve_dir_run()))
+  })
   
   get_cores <- function(){
     val      <- trimws(input$n_cores)
@@ -279,7 +296,6 @@ server <- function(input, output, session) {
       mat_size_mb  <- as.numeric(object.size(X)) / (1000^2)
       total_ram_gb <- as.numeric(memuse::Sys.meminfo()$totalram)/(1000^3)
       total_ram_mb <- total_ram_gb * 1000
-      #total_ram_mb <- as.numeric(memuse::Sys.meminfo()$totalram, units = "MiB")
       safe_cores   <- max(1, min(floor(total_ram_mb / mat_size_mb), parallel::detectCores() - 1))
       safe_cores <- min(100,safe_cores)
       max_safe_cores(safe_cores)
@@ -287,7 +303,6 @@ server <- function(input, output, session) {
         tags$div(class = "cores-hint",
                  paste0("⚠ Max recommended cores: ", safe_cores), tags$br(),
                  paste0("Matrix: ", round(mat_size_mb, 1), " MB  |  Total RAM: ", round(total_ram_gb, 0), " GB"))
-        #paste0("Matrix: ", round(mat_size_mb, 1), " MB  |  Total RAM: ", round(total_ram_mb, 0), " MB"))
       })
     }, error = function(e) {
       output$train_status <- renderUI({
@@ -430,11 +445,9 @@ server <- function(input, output, session) {
   
   observeEvent(input$run_btn, {
     req(trained_obj(), input$trait_file)
-    #------------------------------------------
     shinyjs::disable("run_btn") 
     shinyjs::html("run_btn", "<i class='fa fa-dna'></i> ⏳ Running GWAS pipeline across all traits — please wait...") 
     on.exit({ shinyjs::enable("run_btn"); shinyjs::html("run_btn", "<i class='fa fa-dna'></i> RUN.GWAS") }) 
-    #------------------------------------------
     output$run_status <- renderUI({
       tags$span(class = "status-running", "⏳ Running GWAS pipeline across all traits — please wait...")
     })
@@ -451,13 +464,13 @@ server <- function(input, output, session) {
       } else {
         hitsizes <- NULL
       }
-      dir.create(resolve_dir(), showWarnings = FALSE, recursive = TRUE)
-      result   <- svenetics_pipeline(obj, traitfile, hitsizes = hitsizes, save_dir = resolve_dir())
+      dir.create(resolve_dir_run(), showWarnings = FALSE, recursive = TRUE)
+      result   <- svenetics_pipeline(obj, traitfile, hitsizes = hitsizes, save_dir = resolve_dir_run())
       n_traits <- length(result)
       output$run_status <- renderUI({
         tags$span(class = "status-success",
                   paste0("✔ GWAS complete! ", n_traits, " trait(s) processed."), tags$br(),
-                  paste0("Results saved to: ",resolve_dir()))
+                  paste0("Results saved to: ", resolve_dir_run()))
       })
     }, error = function(e) {
       output$run_status <- renderUI({
