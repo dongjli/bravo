@@ -6,6 +6,7 @@ utils::globalVariables(c("MIP", ".", "j"))
 #' @param truth Integer vector of true causal SNP indices.
 #' @param x SNP matrix.
 #' @param threshold Correlation threshold (default 0.9).
+#' @keyword internal
 
 FDR_corrected <- function(model, truth, x, threshold = 0.9) {
   xmodel = as.matrix(x[,model])
@@ -21,6 +22,7 @@ FDR_corrected <- function(model, truth, x, threshold = 0.9) {
 #' @param truth Integer vector of true causal SNP indices.
 #' @param mapmat Map matrix with chromosome and position columns.
 #' @param winsize Window size in base pairs (default 1000).
+#' @keyword internal
 
 FDR_WS <- function(model, truth, mapmat, winsize = 1000){
   model_chr = mapmat[model,2] ; model_bp = mapmat[model,3]
@@ -42,6 +44,7 @@ FDR_WS <- function(model, truth, mapmat, winsize = 1000){
 #' @param truth Integer vector of true causal SNP indices.
 #' @param x SNP matrix.
 #' @param threshold Correlation threshold (default 0.9).
+#' @keyword internal
 
 FPR_corrected <- function(model, truth, x, threshold = 0.9){
   xmodel = as.matrix(x[,model])
@@ -57,6 +60,7 @@ FPR_corrected <- function(model, truth, x, threshold = 0.9){
 #' @param truth Integer vector of true causal SNP indices.
 #' @param mapmat Map matrix with chromosome and position columns.
 #' @param winsize Window size in base pairs (default 1000).
+#' @keyword internal
 
 FPR_WS <- function(model, truth, mapmat, winsize = 1000){
   model_chr = mapmat[model,2] ; model_bp = mapmat[model,3]
@@ -78,6 +82,7 @@ FPR_WS <- function(model, truth, mapmat, winsize = 1000){
 #' @param truth Integer vector of true causal SNP indices.
 #' @param x SNP matrix.
 #' @param threshold Correlation threshold (default 0.9).
+#' @keyword internal
 
 TPR_corrected <- function(model, truth, x, threshold = 0.9){
   testfor <- as.matrix(x[,model])
@@ -97,6 +102,7 @@ TPR_corrected <- function(model, truth, x, threshold = 0.9){
 #' @param truth Integer vector of true causal SNP indices.
 #' @param mapmat Map matrix with chromosome and position columns.
 #' @param winsize Window size in base pairs (default 1000).
+#' @keyword internal
 
 TPR_WS <- function(model, truth, mapmat, winsize = 1000){
   if(length(model) == 0){return(0)}
@@ -115,6 +121,7 @@ TPR_WS <- function(model, truth, mapmat, winsize = 1000){
 #' @description Computes Jaccard index between selected and true causal SNPs.
 #' @param vars Integer vector of selected SNP indices.
 #' @param truth Integer vector of true causal SNP indices.
+#' @keyword internal
 
 jcidx <- function(vars, truth){
   result = length(intersect(vars, truth))/length(union(vars, truth))
@@ -125,6 +132,7 @@ jcidx <- function(vars, truth){
 #' @description Removes duplicate SNPs and filters low MAF variants.
 #' @param SNPmat A sparse SNP matrix (dgCMatrix).
 #' @param MAF_threshold Minor Allele Frequency cutoff (default 0.05).
+#' @keyword internal
 
 clean <- function(SNPmat, MAF_threshold = 0.05){
   z = SNPmat
@@ -152,6 +160,7 @@ clean <- function(SNPmat, MAF_threshold = 0.05){
 #' @title Create Parameter Grid
 #' @description Builds a grid of lambda and w tuning parameters for SVEN.
 #' @param x Cleaned SNP matrix.
+#' @keyword internal
 
 create_param_mat <- function(x){
   n = nrow(x); p = ncol(x)
@@ -169,6 +178,7 @@ create_param_mat <- function(x){
 #' @param R2 Heritability (default 0.5).
 #' @param nspike Number of causal SNPs to simulate (default 20).
 #' @param betamax Maximum effect size magnitude.
+#' @keyword internal
 
 run_all_params <- function(k, x, R2 = 0.5, nspike = 20, betamax){
   param_mat <- create_param_mat(x)
@@ -200,6 +210,7 @@ run_all_params <- function(k, x, R2 = 0.5, nspike = 20, betamax){
 #' @param ehits Expected number of causal SNPs.
 #' @param betamax Maximum effect size magnitude (default 1).
 #' @param n.cores Number of cores for parallel computation.
+#' @keyword internal
 
 tune.sven <- function(x, R2 = 0.5, ehits = 20, betamax = 1, n.cores){
   nspike = ehits
@@ -229,6 +240,7 @@ tune.sven <- function(x, R2 = 0.5, ehits = 20, betamax = 1, n.cores){
 #' @param R2 Heritability (default 0.5).
 #' @param betamax Maximum effect size magnitude (default 1).
 #' @param n.cores Number of cores for parallel computation.
+#' @keyword internal
 
 tune.sven.all <- function(x, R2 = 0.5, betamax = 1, n.cores){
   a1 = tune.sven(x, R2, ehits = 10, betamax, n.cores)
@@ -244,6 +256,7 @@ tune.sven.all <- function(x, R2 = 0.5, betamax = 1, n.cores){
 #' @param y Phenotype vector.
 #' @param params Named numeric vector with lambda and w.
 #' @param seed Random seed (default 2441139).
+#' @keyword internal
 
 basic.sven.model <- function(x, y, params, seed = 2441139){
   set.seed(seed = seed)
@@ -289,6 +302,7 @@ parameter_selection <- function(X, R2 = 0.5, betamax = 1, n.cores = max(1, paral
 #' @param y Phenotype vector.
 #' @param ehits Expected number of hits.
 #' @param threshold MIP threshold (default 0).
+#' @keyword internal
 
 unite.sven <- function(x, bigx, basic_sven_object, y, ehits, threshold = 0){
   if(is.null(dim(bigx))) stop(paste("bigx has no dimensions, class:", class(bigx), "length:", length(bigx)))
@@ -317,6 +331,7 @@ unite.sven <- function(x, bigx, basic_sven_object, y, ehits, threshold = 0){
 #' @param params Named numeric vector with lambda and w.
 #' @param bigx Full SNP matrix.
 #' @param ehits Expected number of hits (default 20).
+#' @keyword internal
 
 bwas <- function(x, y, params, bigx, ehits = 20){
   object <- basic.sven.model(x, y, params)
@@ -329,6 +344,7 @@ bwas <- function(x, y, params, bigx, ehits = 20){
 #' @param svenetics_trained_object A trained svenetics object from parameter_selection().
 #' @param i Trait index.
 #' @param hitsize One of "small", "medium", "large", or NULL.
+#' @keyword internal
 
 pipeline_single_trait <- function(svenetics_trained_object, i, hitsize = NULL){
   obj = svenetics_trained_object
@@ -411,78 +427,9 @@ svenetics_pipeline <- function(svenetics_trained_object, traitfile, hitsizes = N
 calc.runtime <- function(X){
   y = rnorm(nrow(X))
   start_time <- Sys.time()
-  ff = bravo::sven(X, y)
+  ff = sven(X, y)
   end_time <- Sys.time()
   return(end_time - start_time)
-}
-
-
-
-
-#' @title Convert numeric matrix to sparse matrix
-#' @description Reads a numeric genotype file and converts it to a sparse matrix format. 
-#' @param file.name Path to the numeric genotype file. Could be (and should be) gzipped.
-#' @param num.genotypes Maximum number of genotypes to read. An upper bound is OK.
-#' @param separator "\\t" or "," etc that separates the entries in a line.
-#' @param progress Whether to show a progress bar (default TRUE).
-#' @return A sparse matrix of class dgCMatix.
-#' @export
-
-
-dense2sparse <- function(file.name, num.genotypes, separator,progress = TRUE) {
-  con <- file(file.name, open = "r")
-  
-  if(progress) pb = txtProgressBar(min = 0, max = num.genotypes, initial = 0,
-                                   title = "Progress:",style = 3)
-  
-  header_line <- readLines(con, n = 1)
-  col_names <- strsplit(header_line, split = separator)[[1]][-1]
-  
-  row_names <- character(num.genotypes)
-  row_data <- vector(mode = "list", length = num.genotypes)
-  row_ptr <- integer(num.genotypes+1)
-  col_indices <- vector(mode = "list", length = num.genotypes)
-  
-  line_num <- 0
-  
-  repeat {
-    line <- readLines(con, n = 1)
-    if ({length(line) == 0} || (line_num >= num.genotypes)) {
-      cat("\nNumber of genotypes read: ",line_num)
-      break
-    }
-    line_num <- line_num + 1
-    # cat("Processing line: ",line_num,"\n")
-    fields <- strsplit(line, split = separator)[[1]]
-    row_names[line_num] <- fields[1]
-    
-    vals <- as.numeric(fields[-1])
-    nz_idx <- which(vals != 0)
-    col_indices[[line_num]] <- nz_idx - 1  # 0-based for dgRMatrix
-    row_data[[line_num]] <- vals[nz_idx]
-    row_ptr[line_num + 1] <- row_ptr[line_num] + length(nz_idx)
-    if(progress) setTxtProgressBar(pb,line_num)
-    
-  }
-  if(progress) close(pb)
-  
-  close(con)
-  
-  # Trim excess
-  if(line_num < num.genotypes) {
-    row_ptr = row_ptr[1:{line_num+1}]
-    row_names = row_names[1:line_num]
-  }
-  
-  gc()
-  x = sparseMatrix(j=unlist(col_indices, use.names = FALSE),
-                   p = row_ptr,
-                   x = unlist(row_data, use.names = FALSE),
-                   dims = c(line_num,length(col_names)),
-                   dimnames = list(row_names,col_names),
-                   index1 = FALSE,
-                   repr = "C")
-  return(x)
 }
 
 
