@@ -47,16 +47,18 @@ detect_separator <- function(file.name, n_peek = 10L) {
 ##   separator     optional; auto-detected if NULL
 ##   fixed         is `separator` a fixed string (TRUE) or a regex (FALSE)?
 ##   recode        recode each SNP so its major allele is 0 (per-SNP)
-##   ploidy        max dosage; a flipped value becomes ploidy - x  (default 2)
 ##   na.strings    tokens treated as missing
 ##   repr          "C" (dgCMatrix, default) or "R" (dgRMatrix)
 ## ----------------------------------------------------------------------
 
-#' @title Convert numeric matrix to sparse matrix
+#' @title Convert numeric genotype matrix to sparse matrix
 #' @description Reads a numeric genotype file and converts it to a sparse matrix format.
 #' @param file.name Path to the numeric genotype file. Could be (and should be) gzipped.
 #' @param num.genotypes Maximum number of genotypes to read. An upper bound is OK.
-#' @param separator "\\t" or "," etc that separates the entries in a line.
+#' @param separator "\\t" or "," etc. that separates the entries in a line.
+#' @param fixed Is `separator` a fixed string (TRUE) or a regex (FALSE)?
+#' @param recode        recode each SNP so its major allele is 0 (per-SNP)
+#' @param na.strings    tokens treated as missing
 #' @param progress Whether to show a progress bar (default TRUE).
 #' @return A sparse matrix of class dgCMatix.
 #' @export
@@ -66,10 +68,11 @@ dense2sparse <- function(file.name,
                          fixed         = TRUE,
                          recode        = TRUE,
                          na.strings    = c("NA", ".", "-9", "NN"),
-                         repr          = c("C", "R"),
                          progress      = TRUE) {
   
-  repr <- match.arg(repr)
+  # repr <- match.arg(repr)
+  repr <- "C" # In the future we might support "R".
+  
   if (!requireNamespace("Matrix", quietly = TRUE))
     stop("The 'Matrix' package is required.")
   

@@ -6,7 +6,7 @@ utils::globalVariables(c("MIP", ".", "j"))
 #' @param truth Integer vector of true causal SNP indices.
 #' @param x SNP matrix.
 #' @param threshold Correlation threshold (default 0.9).
-#' @keyword internal
+#' @keywords internal
 
 FDR_corrected <- function(model, truth, x, threshold = 0.9) {
   xmodel = as.matrix(x[,model])
@@ -22,7 +22,7 @@ FDR_corrected <- function(model, truth, x, threshold = 0.9) {
 #' @param truth Integer vector of true causal SNP indices.
 #' @param mapmat Map matrix with chromosome and position columns.
 #' @param winsize Window size in base pairs (default 1000).
-#' @keyword internal
+#' @keywords internal
 
 FDR_WS <- function(model, truth, mapmat, winsize = 1000){
   model_chr = mapmat[model,2] ; model_bp = mapmat[model,3]
@@ -44,7 +44,7 @@ FDR_WS <- function(model, truth, mapmat, winsize = 1000){
 #' @param truth Integer vector of true causal SNP indices.
 #' @param x SNP matrix.
 #' @param threshold Correlation threshold (default 0.9).
-#' @keyword internal
+#' @keywords internal
 
 FPR_corrected <- function(model, truth, x, threshold = 0.9){
   xmodel = as.matrix(x[,model])
@@ -60,7 +60,7 @@ FPR_corrected <- function(model, truth, x, threshold = 0.9){
 #' @param truth Integer vector of true causal SNP indices.
 #' @param mapmat Map matrix with chromosome and position columns.
 #' @param winsize Window size in base pairs (default 1000).
-#' @keyword internal
+#' @keywords internal
 
 FPR_WS <- function(model, truth, mapmat, winsize = 1000){
   model_chr = mapmat[model,2] ; model_bp = mapmat[model,3]
@@ -82,7 +82,7 @@ FPR_WS <- function(model, truth, mapmat, winsize = 1000){
 #' @param truth Integer vector of true causal SNP indices.
 #' @param x SNP matrix.
 #' @param threshold Correlation threshold (default 0.9).
-#' @keyword internal
+#' @keywords internal
 
 TPR_corrected <- function(model, truth, x, threshold = 0.9){
   testfor <- as.matrix(x[,model])
@@ -102,7 +102,7 @@ TPR_corrected <- function(model, truth, x, threshold = 0.9){
 #' @param truth Integer vector of true causal SNP indices.
 #' @param mapmat Map matrix with chromosome and position columns.
 #' @param winsize Window size in base pairs (default 1000).
-#' @keyword internal
+#' @keywords internal
 
 TPR_WS <- function(model, truth, mapmat, winsize = 1000){
   if(length(model) == 0){return(0)}
@@ -121,7 +121,7 @@ TPR_WS <- function(model, truth, mapmat, winsize = 1000){
 #' @description Computes Jaccard index between selected and true causal SNPs.
 #' @param vars Integer vector of selected SNP indices.
 #' @param truth Integer vector of true causal SNP indices.
-#' @keyword internal
+#' @keywords internal
 
 jcidx <- function(vars, truth){
   result = length(intersect(vars, truth))/length(union(vars, truth))
@@ -132,7 +132,7 @@ jcidx <- function(vars, truth){
 #' @description Removes duplicate SNPs and filters low MAF variants.
 #' @param SNPmat A sparse SNP matrix (dgCMatrix).
 #' @param MAF_threshold Minor Allele Frequency cutoff (default 0.05).
-#' @keyword internal
+#' @keywords internal
 
 clean <- function(SNPmat, MAF_threshold = 0.05){
   z = SNPmat
@@ -160,7 +160,7 @@ clean <- function(SNPmat, MAF_threshold = 0.05){
 #' @title Create Parameter Grid
 #' @description Builds a grid of lambda and w tuning parameters for SVEN.
 #' @param x Cleaned SNP matrix.
-#' @keyword internal
+#' @keywords internal
 
 create_param_mat <- function(x){
   n = nrow(x); p = ncol(x)
@@ -178,7 +178,7 @@ create_param_mat <- function(x){
 #' @param R2 Heritability (default 0.5).
 #' @param nspike Number of causal SNPs to simulate (default 20).
 #' @param betamax Maximum effect size magnitude.
-#' @keyword internal
+#' @keywords internal
 
 run_all_params <- function(k, x, R2 = 0.5, nspike = 20, betamax){
   param_mat <- create_param_mat(x)
@@ -210,7 +210,7 @@ run_all_params <- function(k, x, R2 = 0.5, nspike = 20, betamax){
 #' @param ehits Expected number of causal SNPs.
 #' @param betamax Maximum effect size magnitude (default 1).
 #' @param n.cores Number of cores for parallel computation.
-#' @keyword internal
+#' @keywords internal
 
 tune.sven <- function(x, R2 = 0.5, ehits = 20, betamax = 1, n.cores){
   nspike = ehits
@@ -240,7 +240,7 @@ tune.sven <- function(x, R2 = 0.5, ehits = 20, betamax = 1, n.cores){
 #' @param R2 Heritability (default 0.5).
 #' @param betamax Maximum effect size magnitude (default 1).
 #' @param n.cores Number of cores for parallel computation.
-#' @keyword internal
+#' @keywords internal
 
 tune.sven.all <- function(x, R2 = 0.5, betamax = 1, n.cores){
   a1 = tune.sven(x, R2, ehits = 10, betamax, n.cores)
@@ -256,7 +256,7 @@ tune.sven.all <- function(x, R2 = 0.5, betamax = 1, n.cores){
 #' @param y Phenotype vector.
 #' @param params Named numeric vector with lambda and w.
 #' @param seed Random seed (default 2441139).
-#' @keyword internal
+#' @keywords internal
 
 basic.sven.model <- function(x, y, params, seed = 2441139){
   set.seed(seed = seed)
@@ -302,7 +302,7 @@ parameter_selection <- function(X, R2 = 0.5, betamax = 1, n.cores = max(1, paral
 #' @param y Phenotype vector.
 #' @param ehits Expected number of hits.
 #' @param threshold MIP threshold (default 0).
-#' @keyword internal
+#' @keywords internal
 
 unite.sven <- function(x, bigx, basic_sven_object, y, ehits, threshold = 0){
   if(is.null(dim(bigx))) stop(paste("bigx has no dimensions, class:", class(bigx), "length:", length(bigx)))
@@ -331,7 +331,7 @@ unite.sven <- function(x, bigx, basic_sven_object, y, ehits, threshold = 0){
 #' @param params Named numeric vector with lambda and w.
 #' @param bigx Full SNP matrix.
 #' @param ehits Expected number of hits (default 20).
-#' @keyword internal
+#' @keywords internal
 
 bwas <- function(x, y, params, bigx, ehits = 20){
   object <- basic.sven.model(x, y, params)
@@ -344,7 +344,7 @@ bwas <- function(x, y, params, bigx, ehits = 20){
 #' @param svenetics_trained_object A trained svenetics object from parameter_selection().
 #' @param i Trait index.
 #' @param hitsize One of "small", "medium", "large", or NULL.
-#' @keyword internal
+#' @keywords internal
 
 pipeline_single_trait <- function(svenetics_trained_object, i, hitsize = NULL){
   obj = svenetics_trained_object
